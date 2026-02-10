@@ -422,15 +422,21 @@ function PersetujuanTab({ documents, canApprove, approveDocument, rejectDocument
         })}
       </div>
 
-      {/* Approve modal */}
+      {/* Approve modal - System-based, no biometric */}
       {approveId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setApproveId(null)}>
           <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bold text-foreground mb-3">Konfirmasi Persetujuan</h3>
+            <div className="flex items-center gap-3 mb-3">
+              <CheckCircle size={20} className="text-sakura-success" />
+              <h3 className="font-bold text-foreground">Konfirmasi Persetujuan</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">Dokumen akan disetujui oleh sistem.</p>
             <textarea value={approveComment} onChange={(e) => setApproveComment(e.target.value)} placeholder="Komentar (opsional)..." rows={3} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none mb-4" />
             <div className="flex gap-2 justify-end">
               <button onClick={() => { setApproveId(null); setApproveComment(""); }} className="px-4 py-2 rounded-lg border border-input text-sm hover:bg-muted">Batal</button>
-              <button onClick={() => handleApprove(approveId)} className="px-4 py-2 rounded-lg bg-sakura-success text-white text-sm font-semibold hover:opacity-90">Setujui</button>
+              <button onClick={() => handleApprove(approveId)} className="px-4 py-2 rounded-lg bg-sakura-success text-white text-sm font-semibold hover:opacity-90 flex items-center gap-2">
+                <CheckCircle size={14} /> Setujui
+              </button>
             </div>
           </div>
         </div>
