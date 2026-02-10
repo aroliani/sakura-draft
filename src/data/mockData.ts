@@ -51,6 +51,12 @@ export interface Notification {
   docId?: number;
 }
 
+export interface FolderNode {
+  name: string;
+  path: string;
+  children: FolderNode[];
+}
+
 export const USERS: User[] = [
   { id: 1, nama: "Budi Santoso", email: "admin@sakura.sch.id", role: "Administrator IT", avatar: avatarAdmin, departemen: "Operator / TU" },
   { id: 2, nama: "Dr. Siti Rahayu", email: "principal@sakura.sch.id", role: "Kepala Sekolah", avatar: avatarPrincipal, departemen: "Kepala Sekolah" },
@@ -182,18 +188,65 @@ export const CHART_DATA = {
   approvals: [1, 3, 2, 1, 2, 2, 1],
 };
 
-export const FOLDER_STRUCTURE = [
-  {
-    name: "2025", children: [
-      { name: "Kelas 7A" }, { name: "Kelas 7B" }, { name: "Kelas 8A" },
-      { name: "Kelas 8B" }, { name: "Kelas 9A" }, { name: "Kelas 9C" },
-    ],
-  },
-  {
-    name: "2024", children: [
-      { name: "Alumni 2024" }, { name: "Kelas 7A" }, { name: "Kelas 8B" },
-    ],
-  },
-  { name: "Guru", children: [] },
-  { name: "Sekolah", children: [] },
-];
+/** Build dynamic folder tree from documents based on metadata */
+export function buildFolderTree(documents: Document[]): FolderNode[] {
+  const yearMap = new Map<string, Map<string, boolean>>();
+  const standaloneCategories = new Set<string>();
+
+  documents.forEach((doc) => {
+    const tahun = doc.tahunAjaran || "";
+    // Extract the second year (e.g., "2023/2024" -> "2024", "2024/2025" -> "2025")
+    const yearMatch = tahun.match(/(\d{4})\/(\d{4})/);
+    const year = yearMatch ? yearMatch[2] : tahun || "Lainnya";
+    const kelas = doc.kelas || "-";
+
+    // If kelas looks like a class or alumni, put under year
+    if (/^(Kelas|Alumni)/i.test(kelas)) {
+      if (!yearMap.has(year)) yearMap.set(year, new Map());
+      yearMap.get(year)!.set(kelas, true);
+    } else {
+      // Standalone category (Guru, Sekolah, etc.)
+      standaloneCategories.add(kelas);
+    }
+  });
+
+  const tree: FolderNode[] = [];
+
+  // Sort years descending
+  const sortedYears = [...yearMap.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  sortedYears.forEach(([year, classMap]) => {
+    const children = [...classMap.keys()]
+      .sort()
+      .map((cls) => ({ name: cls, path: `${year}/${cls}`, children: [] }));
+    tree.push({ name: year, path: year, children });
+  });
+
+  // Standalone folders
+  [...standaloneCategories].sort().forEach((cat) => {
+    tree.push({ name: cat, path: cat, children: [] });
+  });
+
+  return tree;
+}
+
+/** Check if a document matches a folder path */
+export function docMatchesFolder(doc: Document, folderPath: string): boolean {
+  const tahun = doc.tahunAjaran || "";
+  const yearMatch = tahun.match(/(\d{4})\/(\d{4})/);
+  const year = yearMatch ? yearMatch[2] : tahun || "Lainnya";
+  const kelas = doc.kelas || "-";
+
+  // Exact path match: "2025/Kelas 7A"
+  if (folderPath.includes("/")) {
+    const [folderYear, folderKelas] = folderPath.split("/");
+    return year === folderYear && kelas === folderKelas;
+  }
+
+  // Year-level match: "2025" matches all docs in that year with class-like kelas
+  if (/^\d{4}$/.test(folderPath)) {
+    return year === folderPath && /^(Kelas|Alumni)/i.test(kelas);
+  }
+
+  // Standalone category match: "Guru", "Sekolah"
+  return kelas === folderPath;
+}

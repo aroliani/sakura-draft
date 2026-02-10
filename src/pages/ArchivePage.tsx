@@ -1,10 +1,12 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight } from "lucide-react";
+import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
+import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
 import { useApp } from "@/contexts/AppContext";
-import { FOLDER_STRUCTURE } from "@/data/mockData";
-import type { Document } from "@/data/mockData";
+import { buildFolderTree, docMatchesFolder } from "@/data/mockData";
+import type { Document, FolderNode } from "@/data/mockData";
+import { format } from "date-fns";
 
 export default function ArchivePage() {
   const { documents, toggleFavorite } = useApp();
@@ -13,13 +15,25 @@ export default function ArchivePage() {
   const [categoryFilter, setCategoryFilter] = useState("Semua");
   const [detailDoc, setDetailDoc] = useState<Document | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(["2025"]));
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [showFavorites, setShowFavorites] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
+  const [showPdfOverlay, setShowPdfOverlay] = useState(false);
 
-  const toggleExpand = (name: string) => {
+  // Dynamic folder tree from document metadata
+  const folderTree = useMemo(() => buildFolderTree(documents), [documents]);
+
+  // Auto-expand first year
+  useMemo(() => {
+    if (folderTree.length > 0 && expandedFolders.size === 0) {
+      setExpandedFolders(new Set([folderTree[0].path]));
+    }
+  }, [folderTree]);
+
+  const toggleExpand = (path: string) => {
     setExpandedFolders((prev) => {
       const next = new Set(prev);
-      next.has(name) ? next.delete(name) : next.add(name);
+      next.has(path) ? next.delete(path) : next.add(path);
       return next;
     });
   };
@@ -27,7 +41,7 @@ export default function ArchivePage() {
   const filtered = useMemo(() => {
     let docs = documents;
     if (showFavorites) docs = docs.filter((d) => d.favorite);
-    if (selectedFolder) docs = docs.filter((d) => d.kelas === selectedFolder || d.kategori === selectedFolder);
+    if (selectedFolder) docs = docs.filter((d) => docMatchesFolder(d, selectedFolder));
     if (statusFilter !== "Semua") docs = docs.filter((d) => d.status === statusFilter);
     if (categoryFilter !== "Semua") docs = docs.filter((d) => d.kategori === categoryFilter);
     if (search) {
@@ -37,43 +51,88 @@ export default function ArchivePage() {
     return docs;
   }, [documents, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
 
+  const renderFolder = (folder: FolderNode, depth = 0) => {
+    const isExpanded = expandedFolders.has(folder.path);
+    const hasChildren = folder.children.length > 0;
+    const isSelected = selectedFolder === folder.path;
+
+    return (
+      <div key={folder.path}>
+        <button
+          onClick={() => {
+            if (hasChildren) toggleExpand(folder.path);
+            setSelectedFolder(folder.path);
+            setShowFavorites(false);
+            setPreviewDoc(null);
+          }}
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            isSelected ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+          }`}
+          style={{ paddingLeft: `${12 + depth * 20}px` }}
+        >
+          {hasChildren ? (
+            isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />
+          ) : (
+            <span className="w-3.5 shrink-0" />
+          )}
+          {isExpanded && hasChildren ? (
+            <FolderOpen size={16} className="text-sakura-warning shrink-0" />
+          ) : (
+            <Folder size={16} className={`shrink-0 ${hasChildren ? "text-muted-foreground" : "text-sakura-warning"}`} />
+          )}
+          <span className="truncate">{folder.name}</span>
+        </button>
+        {isExpanded && folder.children.map((child) => renderFolder(child, depth + 1))}
+      </div>
+    );
+  };
+
+  const selectedFolderName = selectedFolder
+    ? selectedFolder.includes("/")
+      ? selectedFolder.split("/")[1]
+      : selectedFolder
+    : null;
+
   return (
     <>
       <AppHeader title="Arsip Dokumen" subtitle="SMP Negeri 4 Cikarang Barat" />
-      <div className="flex flex-1 animate-fade-in">
+      <div className="flex flex-1 animate-fade-in overflow-hidden">
         {/* Left - Folder tree */}
         <div className="w-64 shrink-0 border-r border-border bg-card p-4 space-y-1 overflow-y-auto">
-          <h3 className="font-bold text-foreground text-sm mb-3">📁 Struktur Folder</h3>
-          <button onClick={() => { setSelectedFolder(null); setShowFavorites(false); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"}`}>
+          <h3 className="font-bold text-foreground text-sm mb-3 flex items-center gap-2">
+            <Folder size={16} className="text-sakura-warning" /> Struktur Folder
+          </h3>
+          <button
+            onClick={() => { setSelectedFolder(null); setShowFavorites(false); setPreviewDoc(null); }}
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              !selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+            }`}
+          >
             Semua Dokumen
           </button>
-          <button onClick={() => { setShowFavorites(true); setSelectedFolder(null); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"}`}>
+          <button
+            onClick={() => { setShowFavorites(true); setSelectedFolder(null); setPreviewDoc(null); }}
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+              showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+            }`}
+          >
             <Star size={14} className="text-sakura-warning" /> Favorit
           </button>
           <div className="h-px bg-border my-2" />
-          {FOLDER_STRUCTURE.map((folder) => (
-            <div key={folder.name}>
-              <button onClick={() => { toggleExpand(folder.name); if (folder.children.length === 0) { setSelectedFolder(folder.name); setShowFavorites(false); } }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors text-foreground">
-                {folder.children.length > 0 ? (
-                  <ChevronRight size={14} className={`transition-transform ${expandedFolders.has(folder.name) ? "rotate-90" : ""}`} />
-                ) : <span className="w-3.5" />}
-                {expandedFolders.has(folder.name) ? <FolderOpen size={16} className="text-sakura-warning shrink-0" /> : <Folder size={16} className="text-muted-foreground shrink-0" />}
-                {folder.name}
-              </button>
-              {expandedFolders.has(folder.name) && folder.children.map((child) => (
-                <button key={child.name} onClick={() => { setSelectedFolder(child.name); setShowFavorites(false); }} className={`w-full text-left pl-10 pr-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedFolder === child.name ? "bg-secondary text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
-                  {child.name}
-                </button>
-              ))}
-            </div>
-          ))}
+          {folderTree.map((folder) => renderFolder(folder))}
         </div>
 
-        {/* Right - Content */}
-        <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+        {/* Center - Document list */}
+        <div className={`flex-1 p-6 space-y-4 overflow-y-auto ${previewDoc ? "max-w-[50%]" : ""}`}>
           <div>
-            <h2 className="text-lg font-bold text-foreground">
-              {showFavorites ? "⭐ Dokumen Favorit" : selectedFolder ? `📁 ${selectedFolder}` : "Semua Dokumen Arsip"}
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              {showFavorites ? (
+                <><Star size={20} className="text-sakura-warning fill-sakura-warning" /> Dokumen Favorit</>
+              ) : selectedFolderName ? (
+                <><Folder size={20} className="text-sakura-warning" /> {selectedFolderName}</>
+              ) : (
+                "Semua Dokumen Arsip"
+              )}
             </h2>
             <p className="text-sm text-muted-foreground">{filtered.length} dokumen ditemukan</p>
           </div>
@@ -100,32 +159,136 @@ export default function ArchivePage() {
           {/* Results */}
           <div className="space-y-2">
             {filtered.map((doc) => (
-              <div key={doc.id} className="flex items-center gap-4 p-4 bg-card rounded-lg border border-border hover:shadow transition text-left">
-                <button onClick={() => toggleFavorite(doc.id)} className="shrink-0">
+              <div
+                key={doc.id}
+                className={`flex items-center gap-4 p-4 bg-card rounded-lg border transition cursor-pointer ${
+                  previewDoc?.id === doc.id ? "border-primary shadow-md" : "border-border hover:shadow"
+                }`}
+                onClick={() => setPreviewDoc(doc)}
+              >
+                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(doc.id); }} className="shrink-0">
                   <Star size={18} className={doc.favorite ? "fill-sakura-warning text-sakura-warning" : "text-muted-foreground hover:text-sakura-warning"} />
                 </button>
-                <button onClick={() => setDetailDoc(doc)} className="flex items-center gap-4 flex-1 min-w-0 text-left">
-                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                    <FileIcon size={20} className="text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm text-foreground truncate">{doc.judul}</div>
-                    <div className="text-xs text-muted-foreground">{doc.nomorDokumen} · {doc.kategori} · {doc.kelas}</div>
-                  </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
-                    doc.status === "Disetujui" ? "bg-sakura-success/20 text-sakura-success" :
-                    doc.status === "Menunggu" ? "bg-sakura-warning/20 text-sakura-warning" :
-                    doc.status === "Ditolak" ? "bg-destructive/20 text-destructive" :
-                    "bg-muted text-muted-foreground"
-                  }`}>{doc.status}</span>
-                </button>
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                  <FileIcon size={20} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm text-foreground truncate">{doc.judul}</div>
+                  <div className="text-xs text-muted-foreground">{doc.nomorDokumen} · {doc.kategori} · {doc.kelas}</div>
+                </div>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
+                  doc.status === "Disetujui" ? "bg-sakura-success/20 text-sakura-success" :
+                  doc.status === "Menunggu" ? "bg-sakura-warning/20 text-sakura-warning" :
+                  doc.status === "Ditolak" ? "bg-destructive/20 text-destructive" :
+                  "bg-muted text-muted-foreground"
+                }`}>{doc.status}</span>
               </div>
             ))}
             {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Tidak ada dokumen ditemukan.</p>}
           </div>
         </div>
+
+        {/* Right - Side Preview */}
+        {previewDoc && (
+          <div className="w-[400px] shrink-0 border-l border-border bg-card overflow-y-auto">
+            <div className="p-5 space-y-5">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-foreground text-base">{previewDoc.judul}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">{previewDoc.nomorDokumen}</p>
+                </div>
+                <button onClick={() => setPreviewDoc(null)} className="p-1 rounded hover:bg-muted shrink-0">
+                  <X size={16} />
+                </button>
+              </div>
+
+              <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${
+                previewDoc.status === "Disetujui" ? "bg-sakura-success/20 text-sakura-success" :
+                previewDoc.status === "Menunggu" ? "bg-sakura-warning/20 text-sakura-warning" :
+                previewDoc.status === "Ditolak" ? "bg-destructive/20 text-destructive" :
+                "bg-muted text-muted-foreground"
+              }`}>{previewDoc.status}</span>
+
+              {/* Metadata */}
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-muted-foreground text-xs">Kategori</div>
+                  <div className="font-medium text-foreground">{previewDoc.kategori}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs">Kelas</div>
+                  <div className="font-medium text-foreground">{previewDoc.kelas}</div>
+                </div>
+                {previewDoc.namaSiswa && (
+                  <div>
+                    <div className="text-muted-foreground text-xs">Nama Siswa</div>
+                    <div className="font-medium text-foreground">{previewDoc.namaSiswa}</div>
+                  </div>
+                )}
+                {previewDoc.tahunAjaran && (
+                  <div>
+                    <div className="text-muted-foreground text-xs">Tahun Ajaran</div>
+                    <div className="font-medium text-foreground">{previewDoc.tahunAjaran}</div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-muted-foreground text-xs">Pengunggah</div>
+                  <div className="font-medium text-foreground">{previewDoc.pengunggah.nama}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs">Upload</div>
+                  <div className="font-medium text-foreground">{format(new Date(previewDoc.tanggalUpload), "dd/MM/yyyy")}</div>
+                </div>
+              </div>
+
+              {previewDoc.catatan && (
+                <div className="px-3 py-2 rounded-lg bg-sakura-warning/10 border border-sakura-warning/30 text-sm text-sakura-warning font-medium">
+                  ⚠ {previewDoc.catatan}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowPdfOverlay(true)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  <Eye size={16} /> Preview
+                </button>
+                <button
+                  onClick={() => setDetailDoc(previewDoc)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  <FileIcon size={16} /> Detail
+                </button>
+              </div>
+
+              {/* Audit trail mini */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock size={14} className="text-primary" />
+                  <span className="font-semibold text-sm text-foreground">Jejak Aktivitas</span>
+                </div>
+                <div className="space-y-3">
+                  {previewDoc.auditTrail.slice(0, 4).map((entry, i) => (
+                    <div key={i} className="flex gap-2">
+                      <img src={entry.user.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-foreground">{entry.user.nama}</div>
+                        <div className="text-xs text-foreground">{entry.action}</div>
+                        <div className="text-xs text-muted-foreground">{format(new Date(entry.time), "dd/MM/yyyy HH:mm")}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
+      {showPdfOverlay && previewDoc && <PdfPreviewOverlay onClose={() => setShowPdfOverlay(false)} document={previewDoc} />}
     </>
   );
 }
