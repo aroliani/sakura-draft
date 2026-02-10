@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useApp } from "@/contexts/AppContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import AppLayout from "@/components/layout/AppLayout";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
@@ -15,6 +16,7 @@ import ApprovalPage from "@/pages/ApprovalPage";
 import RoleManagementPage from "@/pages/RoleManagementPage";
 import UserManagementPage from "@/pages/UserManagementPage";
 import LogPage from "@/pages/LogPage";
+import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -40,6 +42,7 @@ function AppRoutes() {
         <Route path="/users" element={<UserManagementPage />} />
         <Route path="/roles" element={<RoleManagementPage />} />
         <Route path="/logs" element={<LogPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -53,7 +56,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppProvider>
-          <AppRoutes />
+          <SettingsProvider>
+            <AppRoutes />
+          </SettingsProvider>
         </AppProvider>
       </BrowserRouter>
     </TooltipProvider>
