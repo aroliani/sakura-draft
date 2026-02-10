@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X } from "lucide-react";
+import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
 import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
+import UploadForm from "@/components/upload/UploadForm";
 import { useApp } from "@/contexts/AppContext";
 import { buildFolderTree, docMatchesFolder } from "@/data/mockData";
 import type { Document, FolderNode } from "@/data/mockData";
@@ -19,6 +20,7 @@ export default function ArchivePage() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
   const [showPdfOverlay, setShowPdfOverlay] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Dynamic folder tree from document metadata
   const folderTree = useMemo(() => buildFolderTree(documents), [documents]);
@@ -153,6 +155,9 @@ export default function ArchivePage() {
             </select>
             <button onClick={() => { setSearch(""); setStatusFilter("Semua"); setCategoryFilter("Semua"); }} className="flex items-center gap-1 px-3 py-2 rounded-lg border border-input text-sm hover:bg-muted transition-colors">
               <RotateCcw size={14} /> Reset
+            </button>
+            <button onClick={() => setShowUploadModal(true)} className="flex items-center gap-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+              <Upload size={14} /> Upload Dokumen
             </button>
           </div>
 
@@ -289,6 +294,26 @@ export default function ArchivePage() {
       </div>
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
       {showPdfOverlay && previewDoc && <PdfPreviewOverlay onClose={() => setShowPdfOverlay(false)} document={previewDoc} />}
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-8">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowUploadModal(false)} />
+          <div className="relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-background rounded-2xl shadow-2xl border border-border p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Upload Dokumen {selectedFolder ? `ke ${selectedFolder}` : ""}</h2>
+                <p className="text-sm text-muted-foreground">Form upload identik dengan halaman Upload Dokumen</p>
+              </div>
+              <button onClick={() => setShowUploadModal(false)} className="p-2 rounded-lg hover:bg-muted"><X size={20} /></button>
+            </div>
+            <UploadForm
+              targetFolder={selectedFolder || undefined}
+              onSuccess={() => setShowUploadModal(false)}
+              onCancel={() => setShowUploadModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

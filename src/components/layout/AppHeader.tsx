@@ -1,7 +1,8 @@
-import { Bell, X } from "lucide-react";
+import { Bell, X, Settings, User, LogOut } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import UserProfileModal from "@/components/modals/UserProfileModal";
 
 interface Props {
@@ -10,11 +11,24 @@ interface Props {
 }
 
 export default function AppHeader({ title, subtitle }: Props) {
-  const { currentUser, notifications, markNotificationRead, markAllNotificationsRead } = useApp();
+  const { currentUser, notifications, markNotificationRead, markAllNotificationsRead, logout } = useApp();
+  const navigate = useNavigate();
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
     <>
@@ -33,7 +47,6 @@ export default function AppHeader({ title, subtitle }: Props) {
               )}
             </button>
 
-            {/* Notification dropdown */}
             {showNotifs && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowNotifs(false)} />
@@ -62,13 +75,40 @@ export default function AppHeader({ title, subtitle }: Props) {
             )}
           </div>
 
-          <button onClick={() => setShowProfile(true)} className="flex items-center gap-3 hover:bg-muted rounded-lg px-3 py-1.5 transition-colors">
-            <img src={currentUser.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
-            <div className="text-right">
-              <div className="text-sm font-semibold text-foreground">{currentUser.nama}</div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium">{currentUser.role}</span>
-            </div>
-          </button>
+          {/* Profile dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-3 hover:bg-muted rounded-lg px-3 py-1.5 transition-colors">
+              <img src={currentUser.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+              <div className="text-right">
+                <div className="text-sm font-semibold text-foreground">{currentUser.nama}</div>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium">{currentUser.role}</span>
+              </div>
+            </button>
+
+            {showDropdown && (
+              <div className="absolute right-0 top-12 z-50 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
+                <button
+                  onClick={() => { setShowDropdown(false); setShowProfile(true); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <User size={16} className="text-muted-foreground" /> Profil Saya
+                </button>
+                <button
+                  onClick={() => { setShowDropdown(false); navigate("/settings"); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <Settings size={16} className="text-muted-foreground" /> Pengaturan Sistem
+                </button>
+                <div className="border-t border-border" />
+                <button
+                  onClick={() => { setShowDropdown(false); logout(); navigate("/"); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-muted transition-colors"
+                >
+                  <LogOut size={16} /> Keluar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
       {showProfile && <UserProfileModal user={currentUser} onClose={() => setShowProfile(false)} />}
