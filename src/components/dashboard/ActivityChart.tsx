@@ -1,6 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { getChartData, CHART_MONTHS } from "@/data/mockData";
 import { useState, useMemo } from "react";
+import { CalendarDays } from "lucide-react";
 
 interface Props {
   onDateClick: (date: string) => void;
@@ -44,15 +45,18 @@ export default function ActivityChart({ onDateClick, onStatusClick }: Props) {
           <p className="text-xs text-muted-foreground">Klik pada titik grafik untuk melihat dokumen, klik legend untuk filter status</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-2 py-1.5 rounded-md text-xs font-medium border border-border bg-card text-foreground"
-          >
-            {CHART_MONTHS.map((m) => (
-              <option key={m.value} value={m.value}>{m.label}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-1.5">
+            <CalendarDays size={14} className="text-muted-foreground" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="text-xs font-medium bg-transparent text-foreground outline-none cursor-pointer"
+            >
+              {CHART_MONTHS.map((m) => (
+                <option key={m.value} value={m.value}>{m.label}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button
               onClick={() => setPeriod("weekly")}
