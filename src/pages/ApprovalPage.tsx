@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, XCircle, Clock, Eye, FileText, ArrowRight, AlertTriangle, Pencil, Fingerprint } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, FileText, ArrowRight, AlertTriangle } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import { useApp } from "@/contexts/AppContext";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
@@ -10,8 +10,6 @@ import { format, differenceInHours } from "date-fns";
 const STEPS = [
   { label: "Staff / Guru Upload", icon: FileText },
   { label: "Antrian Persetujuan", icon: Clock },
-  { label: "Review & Annotate", icon: Pencil },
-  { label: "Verifikasi & Tanda Tangan", icon: Fingerprint },
   { label: "Disetujui / Ditolak", icon: CheckCircle },
 ];
 
@@ -22,11 +20,10 @@ export default function ApprovalPage() {
   const [rejectReason, setRejectReason] = useState("");
   const [approveId, setApproveId] = useState<number | null>(null);
   const [approveComment, setApproveComment] = useState("");
-  const [reviewDoc, setReviewDoc] = useState<Document | null>(null);
 
   const canApprove = hasPermission("documents.approve");
   const pendingDocs = documents.filter((d) => d.status === "Menunggu");
-  const recentDecisions = documents.filter((d) => d.status === "Disetujui" || d.status === "Ditolak").slice(0, 6);
+  const recentDecisions = documents.filter((d) => d.status === "Disetujui" || d.status === "Ditolak" || d.status === "Diarsipkan").slice(0, 6);
 
   const getUrgency = (doc: Document) => {
     const hours = differenceInHours(new Date(), new Date(doc.tanggalUpload));
@@ -51,9 +48,9 @@ export default function ApprovalPage() {
   return (
     <>
       <AppHeader title="Alur Persetujuan" subtitle="Workflow persetujuan dokumen" />
-      <div className="p-8 space-y-6 animate-fade-in">
+      <div className="p-4 sm:p-8 space-y-6 animate-fade-in">
         {/* Workflow visual */}
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
           <h3 className="font-bold text-foreground mb-4">Alur Persetujuan Dokumen</h3>
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
             {STEPS.map((step, i) => (
@@ -74,7 +71,7 @@ export default function ApprovalPage() {
           </div>
         </div>
 
-        {/* Pending queue - Card Layout */}
+        {/* Pending queue */}
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Clock size={20} className="text-sakura-warning" />
@@ -94,7 +91,6 @@ export default function ApprovalPage() {
                 const urgency = getUrgency(doc);
                 return (
                   <div key={doc.id} className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow">
-                    {/* Card header */}
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
                       <div className="flex items-center gap-2.5">
                         <img src={doc.pengunggah.avatar} alt="" className="w-9 h-9 rounded-full object-cover" />
@@ -108,7 +104,6 @@ export default function ApprovalPage() {
                       </span>
                     </div>
 
-                    {/* Card body */}
                     <div className="p-5 space-y-3">
                       <h4 className="font-bold text-foreground leading-snug line-clamp-2">{doc.judul}</h4>
                       <div className="flex flex-wrap gap-2 text-xs">
@@ -126,13 +121,12 @@ export default function ApprovalPage() {
                       )}
                     </div>
 
-                    {/* Card actions */}
                     <div className="flex items-center gap-2 px-5 py-3 border-t border-border bg-muted/10">
                       <button
-                        onClick={() => setReviewDoc(doc)}
+                        onClick={() => setDetailDoc(doc)}
                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border border-border text-xs font-medium hover:bg-muted transition-colors"
                       >
-                        <Pencil size={14} /> Review & Annotate
+                        <Eye size={14} /> Lihat Detail
                       </button>
                       {canApprove && (
                         <>
@@ -140,7 +134,7 @@ export default function ApprovalPage() {
                             onClick={() => setApproveId(doc.id)}
                             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg bg-sakura-success text-white text-xs font-bold hover:opacity-90 transition-opacity"
                           >
-                            <CheckCircle size={14} /> Approve
+                            <CheckCircle size={14} /> Setujui
                           </button>
                           <button
                             onClick={() => setRejectId(doc.id)}
@@ -159,27 +153,25 @@ export default function ApprovalPage() {
           )}
         </div>
 
-        {/* Approve comment modal */}
+        {/* Approve confirmation modal - simplified */}
         {approveId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setApproveId(null)}>
-            <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6 mx-4" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-sakura-success/20 flex items-center justify-center">
-                  <Fingerprint size={20} className="text-sakura-success" />
+                  <CheckCircle size={20} className="text-sakura-success" />
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground">Konfirmasi Persetujuan</h3>
-                  <p className="text-xs text-muted-foreground">Verifikasi biometrik (simulasi)</p>
+                  <p className="text-xs text-muted-foreground">Persetujuan oleh sistem</p>
                 </div>
               </div>
-              <div className="mb-4 p-3 rounded-lg bg-sakura-success/5 border border-sakura-success/20">
-                <p className="text-xs text-muted-foreground">✅ Identitas terverifikasi sebagai <span className="font-semibold text-foreground">{currentUser.nama}</span></p>
-              </div>
-              <textarea value={approveComment} onChange={(e) => setApproveComment(e.target.value)} placeholder="Komentar persetujuan (opsional)..." rows={3} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none mb-4" />
+              <p className="text-sm text-foreground mb-4">Apakah Anda yakin ingin menyetujui dokumen ini? Dokumen akan otomatis masuk ke arsip setelah disetujui.</p>
+              <textarea value={approveComment} onChange={(e) => setApproveComment(e.target.value)} placeholder="Komentar persetujuan (opsional)..." rows={2} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none mb-4" />
               <div className="flex gap-2 justify-end">
                 <button onClick={() => { setApproveId(null); setApproveComment(""); }} className="px-4 py-2 rounded-lg border border-input text-sm hover:bg-muted">Batal</button>
                 <button onClick={() => handleApprove(approveId)} className="px-4 py-2 rounded-lg bg-sakura-success text-white text-sm font-semibold hover:opacity-90 flex items-center gap-2">
-                  <Fingerprint size={16} /> Setujui & Tanda Tangan Digital
+                  <CheckCircle size={16} /> Setujui
                 </button>
               </div>
             </div>
@@ -189,7 +181,7 @@ export default function ApprovalPage() {
         {/* Reject reason modal */}
         {rejectId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setRejectId(null)}>
-            <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6 mx-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="font-bold text-foreground mb-3">Alasan Penolakan</h3>
               <p className="text-sm text-muted-foreground mb-3">Dokumen akan dikembalikan ke pengirim beserta catatan revisi.</p>
               <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Masukkan alasan penolakan dokumen..." rows={3} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none mb-4" />
@@ -202,7 +194,7 @@ export default function ApprovalPage() {
         )}
 
         {/* Recent decisions */}
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
           <h3 className="font-bold text-foreground mb-4">Keputusan Terbaru</h3>
           {recentDecisions.length === 0 ? (
             <p className="text-sm text-muted-foreground">Belum ada keputusan.</p>
@@ -210,15 +202,15 @@ export default function ApprovalPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {recentDecisions.map((doc) => (
                 <button key={doc.id} onClick={() => setDetailDoc(doc)} className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted/30 transition-colors text-left">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${doc.status === "Disetujui" ? "bg-sakura-success/20 text-sakura-success" : "bg-destructive/20 text-destructive"}`}>
-                    {doc.status === "Disetujui" ? <CheckCircle size={18} /> : <XCircle size={18} />}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${doc.status === "Ditolak" ? "bg-destructive/20 text-destructive" : "bg-sakura-success/20 text-sakura-success"}`}>
+                    {doc.status === "Ditolak" ? <XCircle size={18} /> : <CheckCircle size={18} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-foreground truncate">{doc.judul}</div>
                     <div className="text-xs text-muted-foreground">{doc.nomorDokumen} · {doc.pengunggah.nama}</div>
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${doc.status === "Disetujui" ? "bg-sakura-success/20 text-sakura-success" : "bg-destructive/20 text-destructive"}`}>
-                    {doc.status}
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${doc.status === "Ditolak" ? "bg-destructive/20 text-destructive" : "bg-sakura-success/20 text-sakura-success"}`}>
+                    {doc.status === "Diarsipkan" ? "Disetujui" : doc.status}
                   </span>
                 </button>
               ))}
@@ -228,7 +220,6 @@ export default function ApprovalPage() {
       </div>
 
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
-      {reviewDoc && <PdfPreviewOverlay onClose={() => setReviewDoc(null)} document={reviewDoc} />}
     </>
   );
 }

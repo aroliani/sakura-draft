@@ -22,6 +22,9 @@ interface AppState {
   toggleFavorite: (docId: number) => void;
   markNotificationRead: (notifId: number) => void;
   markAllNotificationsRead: () => void;
+  addUser: (user: Omit<User, "id">) => void;
+  updateUser: (userId: number, data: Partial<Omit<User, "id">>) => void;
+  deleteUser: (userId: number) => boolean;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -62,7 +65,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateUserAvatar = (userId: number, avatar: string) => {
-    // Only allow changing own avatar
     if (userId !== currentUser.id) return;
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, avatar } : u)));
     setCurrentUser((p) => ({ ...p, avatar }));
@@ -98,20 +100,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         if (d.id !== docId || d.status !== "Menunggu") return d;
         return {
           ...d,
-          status: "Disetujui" as const,
+          status: "Diarsipkan" as const,
           tanggalEdit: new Date().toISOString(),
-          auditTrail: [...d.auditTrail, {
-            time: new Date().toISOString(),
-            user: { nama: currentUser.nama, avatar: currentUser.avatar, role: currentUser.role },
-            action: comment ? `Menyetujui dokumen — ${comment}` : "Menyetujui dokumen",
-          }],
+          auditTrail: [...d.auditTrail,
+            {
+              time: new Date().toISOString(),
+              user: { nama: currentUser.nama, avatar: currentUser.avatar, role: currentUser.role },
+              action: comment ? `Menyetujui dokumen — ${comment}` : "Menyetujui dokumen",
+            },
+            {
+              time: new Date().toISOString(),
+              user: { nama: "Sistem", avatar: currentUser.avatar, role: "Sistem" },
+              action: "Dokumen otomatis diarsipkan setelah persetujuan",
+            },
+          ],
         };
       })
     );
     const doc = documents.find((d) => d.id === docId);
     if (doc) {
       setNotifications((prev) => [{
-        id: Date.now(), message: `Dokumen '${doc.judul}' telah disetujui`, time: new Date().toISOString(), read: false, type: "approval", docId,
+        id: Date.now(), message: `Dokumen '${doc.judul}' telah disetujui dan diarsipkan`, time: new Date().toISOString(), read: false, type: "approval", docId,
       }, ...prev]);
     }
   };
@@ -193,12 +202,34 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const addUser = (user: Omit<User, "id">) => {
+    if (currentUser.role !== "Admin/TU") return;
+    const newUser: User = { ...user, id: Date.now() };
+    setUsers((prev) => [...prev, newUser]);
+  };
+
+  const updateUser = (userId: number, data: Partial<Omit<User, "id">>) => {
+    if (currentUser.role !== "Admin/TU") return;
+    setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, ...data } : u));
+    if (currentUser.id === userId) {
+      setCurrentUser((p) => ({ ...p, ...data }));
+    }
+  };
+
+  const deleteUser = (userId: number): boolean => {
+    if (currentUser.role !== "Admin/TU") return false;
+    if (userId === currentUser.id) return false;
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    return true;
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser, users, documents, rolePermissions, notifications, isLoggedIn,
       login, logout, updateUserRole, updateUserAvatar, togglePermission, addAuditNote,
       hasPermission, approveDocument, rejectDocument, uploadDocument, archiveDocument,
       toggleFavorite, markNotificationRead, markAllNotificationsRead,
+      addUser, updateUser, deleteUser,
     }}>
       {children}
     </AppContext.Provider>

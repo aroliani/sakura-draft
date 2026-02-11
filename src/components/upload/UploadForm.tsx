@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { Upload, Camera, X, Eye, FileText } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-
-const JENIS_OPTIONS = ["Ijazah", "Rapor", "Surat Keputusan", "Sertifikat", "Data Siswa", "Laporan Keuangan", "Lainnya"];
-const KATEGORI_OPTIONS = ["Ijazah", "Nilai", "SK", "Data Siswa", "Laporan", "Sertifikat"];
+import { useNavigate } from "react-router-dom";
+import { KATEGORI_OPTIONS, KATEGORI_JENIS_MAP, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, buildFolderTree, flattenFolderPaths } from "@/data/mockData";
+import { Calendar } from "@/components/ui/calendar";
 
 interface UploadFormProps {
   targetFolder?: string;
@@ -16,16 +16,22 @@ interface UploadFormProps {
 }
 
 export default function UploadForm({ targetFolder, onSuccess, onCancel }: UploadFormProps) {
-  const { uploadDocument, currentUser } = useApp();
+  const { uploadDocument, currentUser, documents } = useApp();
   const { settings } = useSettings();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDetailFields, setShowDetailFields] = useState(false);
+  const [customJenis, setCustomJenis] = useState("");
+  const [customTahun, setCustomTahun] = useState("");
+  const [detailData, setDetailData] = useState<Record<string, string>>({});
 
-  // Parse targetFolder to pre-fill fields
   const parsedTahun = targetFolder?.split("/")[0] || "";
   const parsedKelas = targetFolder?.split("/")[1] || "";
 
@@ -39,25 +45,37 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
     nisn: "",
     tahunAjaran: parsedTahun || "2024/2025",
     catatan: "",
+    tanggalUpload: new Date(),
+    folderTujuan: targetFolder || "",
   });
 
-  const [mappedFolder, setMappedFolder] = useState<string | null>(targetFolder || null);
+  // Available jenis based on selected kategori
+  const jenisOptions = useMemo(() => {
+    if (!form.kategori) return [];
+    return KATEGORI_JENIS_MAP[form.kategori] || [];
+  }, [form.kategori]);
 
-  // Auto-map folder based on jenisDokumen when folderMapping is enabled
+  // Available detail fields
+  const detailFields = useMemo(() => {
+    return KATEGORI_DETAIL_FIELDS[form.kategori] || [];
+  }, [form.kategori]);
+
+  // Folder paths for dropdown
+  const folderPaths = useMemo(() => {
+    const tree = buildFolderTree(documents);
+    return flattenFolderPaths(tree);
+  }, [documents]);
+
+  // Auto-map folder
   useEffect(() => {
-    if (targetFolder) return; // don't override explicit target
-    if (!settings.folderMapping.enabled || !form.jenisDokumen) {
-      setMappedFolder(null);
-      return;
-    }
+    if (targetFolder) return;
+    if (!settings.folderMapping.enabled || !form.jenisDokumen) return;
     const mapping = settings.folderMapping.mappings.find((m) => m.jenisDokumen === form.jenisDokumen);
     if (mapping) {
       const folderPath = form.tahunAjaran
         ? `${form.tahunAjaran.split("/").pop()}/${mapping.targetFolder}`
         : mapping.targetFolder;
-      setMappedFolder(folderPath);
-    } else {
-      setMappedFolder(null);
+      setForm((p) => ({ ...p, folderTujuan: folderPath }));
     }
   }, [form.jenisDokumen, form.tahunAjaran, settings.folderMapping, targetFolder]);
 
@@ -92,28 +110,50 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.judul) return;
+    setShowConfirm(true);
+  };
+
+  const confirmUpload = () => {
+    const jenis = form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen;
+    const tahun = form.tahunAjaran === "Lainnya" ? customTahun : form.tahunAjaran;
 
     uploadDocument({
       nomorDokumen: form.nomorDokumen || `DOC-${Date.now()}`,
       judul: form.judul,
       kategori: form.kategori || "Lainnya",
       kelas: form.kelas || "-",
-      jenisDokumen: form.jenisDokumen,
+      jenisDokumen: jenis,
       namaSiswa: form.namaSiswa,
       nisn: form.nisn,
-      tahunAjaran: form.tahunAjaran,
+      tahunAjaran: tahun,
       pengunggah: { id: currentUser.id, nama: currentUser.nama, role: currentUser.role, avatar: currentUser.avatar },
-      tanggalUpload: new Date().toISOString(),
-      fileUrl: "/mock/sample.pdf",
+      tanggalUpload: form.tanggalUpload.toISOString(),
+      fileUrl: filePreview || "/mock/sample.pdf",
       catatan: form.catatan || undefined,
+      folderTujuan: form.folderTujuan || undefined,
     });
 
-    toast({ title: "✓ Berhasil", description: "Dokumen berhasil diunggah dan masuk antrian persetujuan!" });
+    setShowConfirm(false);
+    toast({
+      title: "✓ Dokumen Berhasil Diunggah",
+      description: (
+        <div className="flex flex-col gap-2">
+          <span>Dokumen masuk antrian persetujuan.</span>
+          <button
+            onClick={() => navigate("/archive")}
+            className="text-xs text-primary font-semibold hover:underline text-left"
+          >
+            → Lihat di Arsip Dokumen
+          </button>
+        </div>
+      ) as any,
+    });
 
     setTimeout(() => {
       setFile(null);
       setFilePreview(null);
-      setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", kelas: parsedKelas, namaSiswa: "", nisn: "", tahunAjaran: parsedTahun || "2024/2025", catatan: "" });
+      setDetailData({});
+      setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", kelas: parsedKelas, namaSiswa: "", nisn: "", tahunAjaran: parsedTahun || "2024/2025", catatan: "", tanggalUpload: new Date(), folderTujuan: targetFolder || "" });
       onSuccess?.();
     }, 1000);
   };
@@ -135,21 +175,21 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left - File section */}
         <div className="space-y-6">
-          {(targetFolder || mappedFolder) && (
+          {(targetFolder || form.folderTujuan) && (
             <div className="p-3 rounded-lg bg-secondary/50 border border-border text-sm">
               <span className="text-muted-foreground">Masukkan ke folder: </span>
-              <span className="font-semibold text-primary">{targetFolder || mappedFolder}</span>
-              <span className="text-muted-foreground">{!targetFolder && mappedFolder ? " (auto-mapping)" : " (direkomendasikan)"}</span>
+              <span className="font-semibold text-primary">{targetFolder || form.folderTujuan}</span>
+              <span className="text-muted-foreground">{!targetFolder && form.folderTujuan ? " (auto-mapping)" : ""}</span>
             </div>
           )}
-          <div className="bg-card border border-border rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
             <h3 className="font-bold text-foreground mb-4 flex items-center gap-2"><FileText size={18} className="text-primary" /> File Dokumen</h3>
             <div
               onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${isDragOver ? "border-primary bg-secondary/50" : "border-input hover:border-primary/50"}`}
+              className={`border-2 border-dashed rounded-xl p-6 sm:p-10 text-center cursor-pointer transition-colors ${isDragOver ? "border-primary bg-secondary/50" : "border-input hover:border-primary/50"}`}
             >
               <Upload size={40} className="mx-auto text-muted-foreground mb-3" />
               <p className="text-sm text-foreground">Seret file ke sini atau <span className="text-primary font-semibold">klik untuk memilih</span></p>
@@ -158,7 +198,7 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
             <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
 
             <button type="button" onClick={handleScanCamera} className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors">
-              <Camera size={18} /> Scan via Kamera (Simulasi)
+              <Camera size={18} /> Scan via Kamera
             </button>
 
             {file && (
@@ -175,7 +215,7 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
 
           {/* Preview */}
           {(file || filePreview) && (
-            <div className="bg-card border border-border rounded-xl p-6">
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
               <h3 className="font-bold text-foreground mb-4 flex items-center gap-2"><Eye size={18} className="text-primary" /> Pratinjau File</h3>
               {filePreview ? (
                 <img src={filePreview} alt="Preview" className="w-full rounded-lg max-h-64 object-contain bg-muted/30" />
@@ -193,7 +233,7 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
         </div>
 
         {/* Right - Metadata */}
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
           <h3 className="font-bold text-foreground mb-4">Data Dokumen</h3>
           <div className="space-y-4">
             <div>
@@ -204,48 +244,146 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
               <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
               <input required value={form.judul} onChange={(e) => update("judul", e.target.value)} placeholder="Contoh: Ijazah SMP" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
+
+            {/* Kategori (above Jenis) */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Jenis Dokumen *</label>
-              <select required value={form.jenisDokumen} onChange={(e) => update("jenisDokumen", e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-                <option value="">Pilih jenis dokumen</option>
-                {JENIS_OPTIONS.map((j) => <option key={j}>{j}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Kategori</label>
-              <select value={form.kategori} onChange={(e) => update("kategori", e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+              <label className="block text-sm font-medium text-foreground mb-1">Kategori Dokumen *</label>
+              <select required value={form.kategori} onChange={(e) => { update("kategori", e.target.value); update("jenisDokumen", ""); }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="">Pilih kategori</option>
                 {KATEGORI_OPTIONS.map((k) => <option key={k}>{k}</option>)}
               </select>
             </div>
+
+            {/* Jenis Dokumen (cascaded from kategori) */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">Jenis Dokumen *</label>
+              <select
+                required
+                value={form.jenisDokumen}
+                onChange={(e) => update("jenisDokumen", e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                disabled={!form.kategori}
+              >
+                <option value="">{form.kategori ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
+                {jenisOptions.map((j) => <option key={j}>{j}</option>)}
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              {form.jenisDokumen === "Lainnya" && (
+                <input
+                  value={customJenis}
+                  onChange={(e) => setCustomJenis(e.target.value)}
+                  placeholder="Ketik jenis dokumen..."
+                  className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              )}
+            </div>
+
+            {/* Folder tujuan */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">Masukkan ke Folder</label>
+              <select
+                value={form.folderTujuan}
+                onChange={(e) => update("folderTujuan", e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">Auto-mapping</option>
+                {folderPaths.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Kelas</label>
               <input value={form.kelas} onChange={(e) => update("kelas", e.target.value)} readOnly={!!targetFolder && currentUser.role !== "Admin/TU"} placeholder="Contoh: Kelas 7A / Alumni 2024" className={`w-full px-3 py-2.5 rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-ring ${targetFolder && currentUser.role !== "Admin/TU" ? "bg-muted/50 text-muted-foreground" : "bg-background"}`} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Nama Siswa *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Nama Siswa</label>
                 <input value={form.namaSiswa} onChange={(e) => update("namaSiswa", e.target.value)} placeholder="Nama lengkap" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">NISN *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">NISN</label>
                 <input value={form.nisn} onChange={(e) => update("nisn", e.target.value)} placeholder="00xxxxxxxx" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Tahun Ajaran *</label>
-                <input value={form.tahunAjaran} onChange={(e) => update("tahunAjaran", e.target.value)} readOnly={!!targetFolder && currentUser.role !== "Admin/TU"} placeholder="2024/2025" className={`w-full px-3 py-2.5 rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-ring ${targetFolder && currentUser.role !== "Admin/TU" ? "bg-muted/50 text-muted-foreground" : "bg-background"}`} />
+                <label className="block text-sm font-medium text-foreground mb-1">Tahun Ajaran</label>
+                <select
+                  value={form.tahunAjaran}
+                  onChange={(e) => update("tahunAjaran", e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {TAHUN_AJARAN_OPTIONS.map((t) => <option key={t}>{t}</option>)}
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+                {form.tahunAjaran === "Lainnya" && (
+                  <input
+                    value={customTahun}
+                    onChange={(e) => setCustomTahun(e.target.value)}
+                    placeholder="Contoh: 2026/2027"
+                    className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Tanggal Upload</label>
-                <input readOnly value={format(new Date(), "dd/MM/yyyy")} className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-muted-foreground text-sm" />
+                <div className="relative">
+                  <input
+                    readOnly
+                    value={format(form.tanggalUpload, "dd/MM/yyyy")}
+                    onClick={() => setShowDatePicker(!showDatePicker)}
+                    className="w-full px-3 py-2.5 pr-10 rounded-lg border border-input bg-background text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <button type="button" onClick={() => setShowDatePicker(!showDatePicker)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <CalendarIcon size={16} />
+                  </button>
+                  {showDatePicker && (
+                    <div className="absolute z-50 top-full mt-1 right-0 bg-card border border-border rounded-xl shadow-lg">
+                      <Calendar
+                        mode="single"
+                        selected={form.tanggalUpload}
+                        onSelect={(d) => { if (d) { setForm((p) => ({ ...p, tanggalUpload: d })); setShowDatePicker(false); } }}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Catatan (opsional)</label>
               <textarea value={form.catatan} onChange={(e) => update("catatan", e.target.value)} placeholder="Catatan tambahan jika ada" rows={3} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
             </div>
+
+            {/* Optional detail fields */}
+            {detailFields.length > 0 && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowDetailFields(!showDetailFields)}
+                  className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  <ChevronDown size={14} className={`transition-transform ${showDetailFields ? "rotate-180" : ""}`} />
+                  Tambah Data Detail (Opsional)
+                </button>
+                {showDetailFields && (
+                  <div className="mt-3 space-y-3 p-4 rounded-lg border border-border bg-muted/20">
+                    {detailFields.map((field) => (
+                      <div key={field.key}>
+                        <label className="block text-sm font-medium text-foreground mb-1">{field.label}</label>
+                        <input
+                          value={detailData[field.key] || ""}
+                          onChange={(e) => setDetailData((p) => ({ ...p, [field.key]: e.target.value }))}
+                          placeholder={field.placeholder}
+                          className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-3">
               {onCancel && (
                 <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-lg border border-input text-sm font-semibold hover:bg-muted transition-colors">
@@ -259,6 +397,27 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }: Upload
           </div>
         </div>
       </form>
+
+      {/* Confirm dialog */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setShowConfirm(false)}>
+          <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6 mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-foreground text-lg mb-2">Konfirmasi Upload</h3>
+            <p className="text-sm text-muted-foreground mb-4">Apakah Anda yakin semua data dokumen sudah benar? Dokumen akan masuk antrian persetujuan setelah diunggah.</p>
+            <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm space-y-1 mb-4">
+              <div><span className="text-muted-foreground">Nama:</span> <span className="font-medium text-foreground">{form.judul}</span></div>
+              <div><span className="text-muted-foreground">Kategori:</span> <span className="font-medium text-foreground">{form.kategori}</span></div>
+              <div><span className="text-muted-foreground">Jenis:</span> <span className="font-medium text-foreground">{form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen}</span></div>
+              {file && <div><span className="text-muted-foreground">File:</span> <span className="font-medium text-foreground">{file.name}</span></div>}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setShowConfirm(false)} className="px-4 py-2 rounded-lg border border-input text-sm hover:bg-muted">Periksa Lagi</button>
+              <button onClick={confirmUpload} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90">Ya, Upload Sekarang</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showPdfPreview && <PdfPreviewOverlay onClose={() => setShowPdfPreview(false)} document={{
         id: 0, nomorDokumen: form.nomorDokumen || "DRAFT", judul: form.judul || "Dokumen Baru",
         kategori: form.kategori || "Umum", kelas: form.kelas || "-", jenisDokumen: form.jenisDokumen,
