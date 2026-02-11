@@ -19,12 +19,7 @@ const BOTTOM_ITEMS = [
   { label: "Pengaturan Sistem", icon: Settings, path: "/settings", section: "tema" },
 ];
 
-interface Props {
-  mobileMode?: boolean;
-  onClose?: () => void;
-}
-
-export default function AppSidebar({ mobileMode, onClose }: Props = {}) {
+export default function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, hasPermission } = useApp();
@@ -32,13 +27,8 @@ export default function AppSidebar({ mobileMode, onClose }: Props = {}) {
 
   const visibleItems = NAV_ITEMS.filter((item) => hasPermission(item.permission));
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    if (mobileMode && onClose) onClose();
-  };
-
   return (
-    <aside className={`${mobileMode ? "w-[260px] h-full" : (collapsed ? "w-[68px]" : "w-[260px]")} ${mobileMode ? "" : "sticky top-0 h-screen hidden md:flex"} bg-sidebar flex flex-col shrink-0 transition-all duration-300 overflow-y-auto`}>
+    <aside className={`${collapsed ? "w-[68px]" : "w-[260px]"} min-h-screen bg-sidebar flex flex-col shrink-0 transition-all duration-300`}>
       {/* Top: Logo + Collapse button */}
       <div className="flex items-center gap-3 px-4 py-5">
         <img src={logoSakura} alt="SAKURA" className="w-10 h-10 rounded-full bg-sidebar-accent shrink-0" />
@@ -52,6 +42,7 @@ export default function AppSidebar({ mobileMode, onClose }: Props = {}) {
           onClick={() => setCollapsed(!collapsed)}
           title={collapsed ? "Perluas sidebar" : "Sembunyikan sidebar"}
           className="p-1.5 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors shrink-0"
+          style={{ display: "flex" }}
         >
           {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
         </button>
@@ -63,7 +54,7 @@ export default function AppSidebar({ mobileMode, onClose }: Props = {}) {
           return (
             <button
               key={item.path}
-              onClick={() => handleNavigate(item.path)}
+              onClick={() => navigate(item.path)}
               title={collapsed ? item.label : undefined}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
@@ -85,7 +76,7 @@ export default function AppSidebar({ mobileMode, onClose }: Props = {}) {
           return (
             <button
               key={item.label}
-              onClick={() => handleNavigate(item.path)}
+              onClick={() => navigate(item.path)}
               title={collapsed ? item.label : undefined}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
