@@ -17,6 +17,23 @@ const STATUS_COLORS: Record<string, string> = {
   Diarsipkan: "bg-muted text-muted-foreground",
 };
 
+const ACTION_BADGE: Record<string, string> = {
+  "Mengunggah": "bg-primary/10 text-primary border border-primary/20",
+  "Menyetujui": "bg-sakura-success/10 text-sakura-success border border-sakura-success/20",
+  "Menolak": "bg-destructive/10 text-destructive border border-destructive/20",
+  "Mengarsipkan": "bg-muted text-muted-foreground border border-border",
+  "Melihat": "bg-secondary text-foreground border border-border",
+  "Catatan": "bg-accent/10 text-accent border border-accent/20",
+  "Dokumen otomatis": "bg-muted text-muted-foreground border border-border",
+};
+
+function getActionBadgeClass(action: string): string {
+  for (const [key, cls] of Object.entries(ACTION_BADGE)) {
+    if (action.startsWith(key) || action.includes(key.toLowerCase())) return cls;
+  }
+  return "bg-secondary text-foreground border border-border";
+}
+
 export default function DocumentDetailModal({ document: doc, onClose }: Props) {
   const [showPdf, setShowPdf] = useState(false);
   const [noteText, setNoteText] = useState("");
@@ -58,44 +75,53 @@ export default function DocumentDetailModal({ document: doc, onClose }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in p-4" onClick={onClose}>
         <div className="bg-card rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-fade-in" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                 <FileText size={20} className="text-primary" />
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-foreground">{doc.judul}</h2>
+              <div className="min-w-0">
+                <h2 className="text-base sm:text-lg font-bold text-foreground truncate">{doc.judul}</h2>
                 <p className="text-sm text-muted-foreground">{doc.kategori} · {doc.kelas}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <span className={`text-xs font-medium px-3 py-1 rounded-full ${STATUS_COLORS[doc.status]}`}>{doc.status}</span>
               <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted"><X size={20} /></button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               {[
                 ["Nomor Dokumen", doc.nomorDokumen],
                 ["Kategori", doc.kategori],
                 ["Kelas / Unit", doc.kelas],
-                ["Pengunggah", doc.pengunggah.nama],
+                ["Pengunggah", null],
                 ["Tanggal Upload", format(new Date(doc.tanggalUpload), "yyyy-MM-dd HH:mm")],
                 ["Tanggal Edit Terakhir", format(new Date(doc.tanggalEdit), "yyyy-MM-dd HH:mm")],
                 ["Versi", `v${doc.versi}`],
-                ["Status", doc.status],
+                ["Status", null],
                 ...(doc.namaSiswa ? [["Nama Siswa", doc.namaSiswa]] : []),
                 ...(doc.nisn ? [["NISN", doc.nisn]] : []),
                 ...(doc.tahunAjaran ? [["Tahun Ajaran", doc.tahunAjaran]] : []),
               ].map(([label, val]) => (
-                <div key={label}>
+                <div key={label as string}>
                   <div className="text-muted-foreground text-xs">{label}</div>
-                  <div className="font-medium text-foreground">{val}</div>
+                  {label === "Pengunggah" ? (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-medium text-foreground">{doc.pengunggah.nama}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">{doc.pengunggah.role}</span>
+                    </div>
+                  ) : label === "Status" ? (
+                    <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-0.5 ${STATUS_COLORS[doc.status]}`}>{doc.status}</span>
+                  ) : (
+                    <div className="font-medium text-foreground">{val}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -135,9 +161,10 @@ export default function DocumentDetailModal({ document: doc, onClose }: Props) {
             {showApproveForm && (
               <div className="p-4 rounded-lg border border-sakura-success/30 bg-sakura-success/5 space-y-3">
                 <h4 className="font-semibold text-sm text-sakura-success">Konfirmasi Persetujuan</h4>
-                <textarea value={approveComment} onChange={(e) => setApproveComment(e.target.value)} placeholder="Komentar (opsional), misal: Dokumen sudah sesuai standar..." rows={2} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+                <p className="text-sm text-foreground">Apakah Anda yakin ingin menyetujui dokumen ini?</p>
+                <textarea value={approveComment} onChange={(e) => setApproveComment(e.target.value)} placeholder="Komentar (opsional)..." rows={2} className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                 <div className="flex gap-2">
-                  <button onClick={handleApprove} className="px-4 py-2 rounded-lg bg-sakura-success text-white text-sm font-semibold hover:opacity-90">Konfirmasi Setujui</button>
+                  <button onClick={handleApprove} className="px-4 py-2 rounded-lg bg-sakura-success text-white text-sm font-semibold hover:opacity-90">Setujui</button>
                   <button onClick={() => { setShowApproveForm(false); setApproveComment(""); }} className="px-4 py-2 rounded-lg border border-input text-sm">Batal</button>
                 </div>
               </div>
@@ -169,11 +196,13 @@ export default function DocumentDetailModal({ document: doc, onClose }: Props) {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-sm text-foreground">{entry.user.nama}</span>
-                        <span className="text-xs text-muted-foreground">— {entry.user.role}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">{entry.user.role}</span>
                         <span className="text-xs text-muted-foreground ml-auto">{format(new Date(entry.time), "yyyy-MM-dd HH:mm")}</span>
                       </div>
-                      <div className={`text-sm mt-0.5 ${entry.action.startsWith("Catatan Admin") ? "text-accent font-medium italic" : "text-foreground"}`}>
-                        {entry.action}
+                      <div className="mt-1">
+                        <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${getActionBadgeClass(entry.action)}`}>
+                          {entry.action}
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -40,6 +40,7 @@ export interface Document {
   catatan?: string;
   auditTrail: AuditEntry[];
   favorite?: boolean;
+  folderTujuan?: string;
 }
 
 export interface Notification {
@@ -66,8 +67,8 @@ export const USERS: User[] = [
 
 export const DOCUMENTS: Document[] = [
   {
-    id: 1, nomorDokumen: "IJZ-2024-001", judul: "Ijazah - Ahmad Rizki", kategori: "Ijazah", kelas: "Alumni 2024",
-    jenisDokumen: "Ijazah", namaSiswa: "Ahmad Rizki", nisn: "0012345678", tahunAjaran: "2023/2024",
+    id: 1, nomorDokumen: "IJZ-2024-001", judul: "Ijazah - Ahmad Rizki", kategori: "Data Siswa", kelas: "Alumni 2024",
+    jenisDokumen: "Ijazah SMP", namaSiswa: "Ahmad Rizki", nisn: "0012345678", tahunAjaran: "2023/2024",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-08-22T15:49:05Z", tanggalEdit: "2025-08-23T10:12:00Z", status: "Disetujui", versi: 1,
     fileUrl: "/mock/sample.pdf",
@@ -78,8 +79,8 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 2, nomorDokumen: "NLI-2024-015", judul: "Laporan Nilai Semester Ganjil Kelas 7A", kategori: "Nilai", kelas: "Kelas 7A",
-    jenisDokumen: "Rapor", namaSiswa: "Kelas 7A", nisn: "-", tahunAjaran: "2024/2025",
+    id: 2, nomorDokumen: "NLI-2024-015", judul: "Laporan Nilai Semester Ganjil Kelas 7A", kategori: "Data Siswa", kelas: "Kelas 7A",
+    jenisDokumen: "Rekapitulasi Absensi Siswa dan Guru", namaSiswa: "Kelas 7A", nisn: "-", tahunAjaran: "2024/2025",
     pengunggah: { id: 4, nama: "Ahmad Fauzi", role: "Guru", avatar: avatarTeacher },
     tanggalUpload: "2025-09-01T08:24:00Z", tanggalEdit: "2025-09-01T09:54:00Z", status: "Menunggu", versi: 1,
     fileUrl: "/mock/sample.pdf", catatan: "Dokumen sensitif - perlu review",
@@ -88,8 +89,8 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 3, nomorDokumen: "SK-2024-003", judul: "SK Pengangkatan Guru Tetap - Rina Wati", kategori: "SK", kelas: "Guru",
-    jenisDokumen: "Surat Keputusan", tahunAjaran: "2024/2025",
+    id: 3, nomorDokumen: "SK-2024-003", judul: "SK Pengangkatan Guru Tetap - Rina Wati", kategori: "Data Guru", kelas: "Guru",
+    jenisDokumen: "Surat Keputusan (Arsip Surat)", tahunAjaran: "2024/2025",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-09-05T10:00:00Z", tanggalEdit: "2025-09-06T14:30:00Z", status: "Disetujui", versi: 2,
     fileUrl: "/mock/sample.pdf",
@@ -99,8 +100,8 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 4, nomorDokumen: "IJZ-2024-002", judul: "Ijazah - Siti Nurhaliza", kategori: "Ijazah", kelas: "Alumni 2024",
-    jenisDokumen: "Ijazah", namaSiswa: "Siti Nurhaliza", nisn: "0012345679", tahunAjaran: "2023/2024",
+    id: 4, nomorDokumen: "IJZ-2024-002", judul: "Ijazah - Siti Nurhaliza", kategori: "Data Siswa", kelas: "Alumni 2024",
+    jenisDokumen: "Ijazah SMP", namaSiswa: "Siti Nurhaliza", nisn: "0012345679", tahunAjaran: "2023/2024",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-09-10T11:00:00Z", tanggalEdit: "2025-09-10T15:00:00Z", status: "Ditolak", versi: 1,
     fileUrl: "/mock/sample.pdf", catatan: "Format tidak sesuai standar",
@@ -111,7 +112,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 5, nomorDokumen: "ARS-2024-001", judul: "Arsip Data Siswa Kelas 8B", kategori: "Data Siswa", kelas: "Kelas 8B",
-    jenisDokumen: "Data Siswa", tahunAjaran: "2023/2024",
+    jenisDokumen: "Surat Masuk dan Keluar Siswa", tahunAjaran: "2023/2024",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-07-15T09:00:00Z", tanggalEdit: "2025-08-01T10:00:00Z", status: "Diarsipkan", versi: 1,
     fileUrl: "/mock/sample.pdf",
@@ -122,8 +123,8 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 6, nomorDokumen: "NLI-2024-016", judul: "Laporan Nilai UTS Kelas 9C", kategori: "Nilai", kelas: "Kelas 9C",
-    jenisDokumen: "Rapor", namaSiswa: "Kelas 9C", nisn: "-", tahunAjaran: "2024/2025",
+    id: 6, nomorDokumen: "NLI-2024-016", judul: "Laporan Nilai UTS Kelas 9C", kategori: "Data Siswa", kelas: "Kelas 9C",
+    jenisDokumen: "Rekapitulasi Absensi Siswa dan Guru", namaSiswa: "Kelas 9C", nisn: "-", tahunAjaran: "2024/2025",
     pengunggah: { id: 4, nama: "Ahmad Fauzi", role: "Guru", avatar: avatarTeacher },
     tanggalUpload: "2025-09-12T07:30:00Z", tanggalEdit: "2025-09-12T07:30:00Z", status: "Menunggu", versi: 1,
     fileUrl: "/mock/sample.pdf",
@@ -132,8 +133,8 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 7, nomorDokumen: "SK-2024-004", judul: "SK Mutasi Guru - Andi Prasetyo", kategori: "SK", kelas: "Guru",
-    jenisDokumen: "Surat Keputusan", tahunAjaran: "2024/2025",
+    id: 7, nomorDokumen: "SK-2024-004", judul: "SK Mutasi Guru - Andi Prasetyo", kategori: "Data Guru", kelas: "Guru",
+    jenisDokumen: "Surat Keputusan (Arsip Surat)", tahunAjaran: "2024/2025",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-09-08T13:00:00Z", tanggalEdit: "2025-09-09T08:00:00Z", status: "Disetujui", versi: 1,
     fileUrl: "/mock/sample.pdf",
@@ -143,7 +144,7 @@ export const DOCUMENTS: Document[] = [
     ],
   },
   {
-    id: 8, nomorDokumen: "LAP-2024-001", judul: "Laporan Keuangan Semester 1", kategori: "Laporan", kelas: "Sekolah",
+    id: 8, nomorDokumen: "LAP-2024-001", judul: "Laporan Keuangan Semester 1", kategori: "Keuangan", kelas: "Sekolah",
     jenisDokumen: "Laporan Keuangan", tahunAjaran: "2024/2025",
     pengunggah: { id: 3, nama: "Dewi Kartika", role: "Staff Administrasi", avatar: avatarStaff },
     tanggalUpload: "2025-09-15T10:00:00Z", tanggalEdit: "2025-09-15T10:00:00Z", status: "Menunggu", versi: 1,
@@ -181,11 +182,87 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   "Guru": ["dashboard.view", "documents.upload", "documents.archive", "profile.edit"],
 };
 
+// Kategori & Jenis Dokumen mapping
+export const KATEGORI_OPTIONS = [
+  "Data Siswa",
+  "Data Guru",
+  "Sarana Prasarana Sekolah",
+  "Surat Menyurat",
+  "Keuangan",
+  "Lainnya",
+];
+
+export const KATEGORI_JENIS_MAP: Record<string, string[]> = {
+  "Data Siswa": [
+    "Surat Masuk dan Keluar Siswa",
+    "Surat Pindah Siswa",
+    "Ijazah SMP",
+    "Surat Keterangan Hasil Ujian (SKHU)",
+    "Rekapitulasi Absensi Siswa dan Guru",
+    "Sertifikat Prestasi Siswa",
+  ],
+  "Data Guru": [
+    "Sertifikat Guru",
+    "Surat Keputusan (Arsip Surat)",
+    "Rekapitulasi Absensi Siswa dan Guru",
+  ],
+  "Sarana Prasarana Sekolah": [
+    "Inventaris Sarana Prasarana",
+  ],
+  "Surat Menyurat": [
+    "Surat Masuk dan Keluar Siswa",
+    "Surat Pindah Siswa",
+    "Surat Keputusan (Arsip Surat)",
+  ],
+  "Keuangan": [
+    "Laporan Keuangan",
+  ],
+  "Lainnya": [
+    "Sertifikat Prestasi Siswa",
+    "Lainnya",
+  ],
+};
+
+// Detail fields per category (optional)
+export const KATEGORI_DETAIL_FIELDS: Record<string, { key: string; label: string; placeholder: string }[]> = {
+  "Data Siswa": [
+    { key: "nis", label: "NIS", placeholder: "Nomor Induk Siswa" },
+    { key: "tempatLahir", label: "Tempat Lahir", placeholder: "Contoh: Bekasi" },
+    { key: "tanggalLahir", label: "Tanggal Lahir", placeholder: "DD/MM/YYYY" },
+    { key: "namaOrangTua", label: "Nama Orang Tua/Wali", placeholder: "Nama lengkap" },
+    { key: "alamat", label: "Alamat", placeholder: "Alamat lengkap" },
+  ],
+  "Data Guru": [
+    { key: "nip", label: "NIP", placeholder: "Nomor Induk Pegawai" },
+    { key: "bidangStudi", label: "Bidang Studi", placeholder: "Contoh: Matematika" },
+    { key: "jabatan", label: "Jabatan", placeholder: "Contoh: Guru Tetap" },
+  ],
+  "Sarana Prasarana Sekolah": [
+    { key: "kodeBarang", label: "Kode Barang", placeholder: "Contoh: INV-001" },
+    { key: "lokasi", label: "Lokasi", placeholder: "Contoh: Ruang Lab IPA" },
+    { key: "kondisi", label: "Kondisi", placeholder: "Baik / Rusak Ringan / Rusak Berat" },
+  ],
+};
+
+export const TAHUN_AJARAN_OPTIONS = ["2023/2024", "2024/2025", "2025/2026"];
+
 export const CHART_DATA = {
   labels: ["Sab, 3", "Min, 4", "Sen, 5", "Sel, 6", "Rab, 7", "Kam, 8", "Jum, 9"],
   dates: ["2025-09-03", "2025-09-04", "2025-09-05", "2025-09-06", "2025-09-07", "2025-09-08", "2025-09-09"],
   uploads: [3, 5, 2, 4, 6, 3, 2],
   approvals: [1, 3, 2, 1, 2, 2, 1],
+  disetujui: [1, 2, 1, 1, 2, 1, 1],
+  ditolak: [0, 1, 1, 0, 0, 1, 0],
+  menunggu: [2, 2, 0, 3, 4, 1, 1],
+};
+
+export const CHART_DATA_MONTHLY = {
+  labels: Array.from({ length: 30 }, (_, i) => `${i + 1}`),
+  dates: Array.from({ length: 30 }, (_, i) => `2025-09-${String(i + 1).padStart(2, "0")}`),
+  uploads: [3, 5, 2, 4, 6, 3, 2, 4, 1, 3, 5, 2, 6, 3, 4, 2, 5, 3, 1, 4, 6, 2, 3, 5, 4, 2, 3, 1, 4, 5],
+  disetujui: [1, 2, 1, 1, 2, 1, 1, 2, 0, 1, 2, 1, 3, 1, 2, 1, 2, 1, 0, 1, 3, 1, 1, 2, 2, 1, 1, 0, 2, 2],
+  ditolak: [0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+  menunggu: [2, 2, 0, 3, 4, 1, 1, 2, 0, 2, 2, 1, 3, 1, 2, 0, 3, 2, 0, 3, 3, 0, 2, 3, 1, 1, 1, 1, 2, 2],
 };
 
 /** Build dynamic folder tree from documents based on metadata */
@@ -195,24 +272,20 @@ export function buildFolderTree(documents: Document[]): FolderNode[] {
 
   documents.forEach((doc) => {
     const tahun = doc.tahunAjaran || "";
-    // Extract the second year (e.g., "2023/2024" -> "2024", "2024/2025" -> "2025")
     const yearMatch = tahun.match(/(\d{4})\/(\d{4})/);
     const year = yearMatch ? yearMatch[2] : tahun || "Lainnya";
     const kelas = doc.kelas || "-";
 
-    // If kelas looks like a class or alumni, put under year
     if (/^(Kelas|Alumni)/i.test(kelas)) {
       if (!yearMap.has(year)) yearMap.set(year, new Map());
       yearMap.get(year)!.set(kelas, true);
     } else {
-      // Standalone category (Guru, Sekolah, etc.)
       standaloneCategories.add(kelas);
     }
   });
 
   const tree: FolderNode[] = [];
 
-  // Sort years descending
   const sortedYears = [...yearMap.entries()].sort((a, b) => b[0].localeCompare(a[0]));
   sortedYears.forEach(([year, classMap]) => {
     const children = [...classMap.keys()]
@@ -221,7 +294,6 @@ export function buildFolderTree(documents: Document[]): FolderNode[] {
     tree.push({ name: year, path: year, children });
   });
 
-  // Standalone folders
   [...standaloneCategories].sort().forEach((cat) => {
     tree.push({ name: cat, path: cat, children: [] });
   });
@@ -236,17 +308,26 @@ export function docMatchesFolder(doc: Document, folderPath: string): boolean {
   const year = yearMatch ? yearMatch[2] : tahun || "Lainnya";
   const kelas = doc.kelas || "-";
 
-  // Exact path match: "2025/Kelas 7A"
   if (folderPath.includes("/")) {
     const [folderYear, folderKelas] = folderPath.split("/");
     return year === folderYear && kelas === folderKelas;
   }
 
-  // Year-level match: "2025" matches all docs in that year with class-like kelas
   if (/^\d{4}$/.test(folderPath)) {
     return year === folderPath && /^(Kelas|Alumni)/i.test(kelas);
   }
 
-  // Standalone category match: "Guru", "Sekolah"
   return kelas === folderPath;
+}
+
+/** Flatten folder tree to get all paths for folder selector */
+export function flattenFolderPaths(nodes: FolderNode[], prefix = ""): string[] {
+  const paths: string[] = [];
+  nodes.forEach((node) => {
+    paths.push(node.path);
+    if (node.children.length > 0) {
+      paths.push(...flattenFolderPaths(node.children));
+    }
+  });
+  return paths;
 }

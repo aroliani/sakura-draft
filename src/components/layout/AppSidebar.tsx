@@ -29,15 +29,24 @@ export default function AppSidebar() {
 
   return (
     <aside className={`${collapsed ? "w-[68px]" : "w-[260px]"} min-h-screen bg-sidebar flex flex-col shrink-0 transition-all duration-300`}>
+      {/* Top: Logo + Collapse button */}
       <div className="flex items-center gap-3 px-4 py-5">
         <img src={logoSakura} alt="SAKURA" className="w-10 h-10 rounded-full bg-sidebar-accent shrink-0" />
         {!collapsed && (
-          <div>
+          <div className="flex-1 min-w-0">
             <div className="text-sidebar-primary font-bold text-lg leading-tight">SAKURA</div>
             <div className="text-sidebar-foreground/70 text-xs">Secure Archive System</div>
           </div>
         )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? "Perluas sidebar" : "Sembunyikan sidebar"}
+          className="p-1.5 rounded-lg text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors shrink-0"
+        >
+          {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
+
       <nav className="flex-1 px-3 space-y-1 mt-2">
         {visibleItems.map((item) => {
           const active = location.pathname === item.path;
@@ -59,7 +68,7 @@ export default function AppSidebar() {
         })}
       </nav>
 
-      {/* Bottom: Profile, Settings, Collapse */}
+      {/* Bottom: Profile, Settings */}
       <div className="px-3 space-y-1 mb-2">
         {BOTTOM_ITEMS.map((item) => {
           const active = location.pathname === item.path;
@@ -79,14 +88,6 @@ export default function AppSidebar() {
             </button>
           );
         })}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? "Perluas sidebar" : "Sembunyikan sidebar"}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors"
-        >
-          {collapsed ? <PanelLeft size={18} className="shrink-0" /> : <PanelLeftClose size={18} className="shrink-0" />}
-          {!collapsed && "Sembunyikan"}
-        </button>
       </div>
 
       <div className="px-3 py-4 border-t border-sidebar-border">

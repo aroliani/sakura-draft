@@ -99,7 +99,18 @@ function OverviewTab({ visibleDocs, onOpenList, onSelectDoc }: {
   };
 
   const handleChartClick = (date: string) => {
-    onOpenList(`Dokumen tanggal ${date}`, visibleDocs.slice(0, 3));
+    const matched = visibleDocs.filter((d) => d.tanggalUpload.startsWith(date));
+    onOpenList(`Dokumen tanggal ${date}`, matched.length > 0 ? matched : visibleDocs.slice(0, 3));
+  };
+
+  const handleStatusClick = (status: string) => {
+    const statusMap: Record<string, string> = { "Disetujui": "Disetujui", "Ditolak": "Ditolak", "Menunggu": "Menunggu", "Upload": "all" };
+    const key = statusMap[status];
+    if (key === "all") {
+      onOpenList(`Semua Dokumen (Upload)`, visibleDocs);
+    } else if (key) {
+      onOpenList(`Dokumen ${status}`, visibleDocs.filter((d) => d.status === key || (key === "Disetujui" && d.status === "Diarsipkan")));
+    }
   };
 
   const recentDocs = [...visibleDocs].sort((a, b) => new Date(b.tanggalUpload).getTime() - new Date(a.tanggalUpload).getTime()).slice(0, 5);
@@ -124,7 +135,7 @@ function OverviewTab({ visibleDocs, onOpenList, onSelectDoc }: {
         <DashboardCard title="Diarsipkan" value={counts.diarsipkan} icon={Archive} variant="muted" onClick={() => onOpenList("Dokumen Diarsipkan", visibleDocs.filter((d) => d.status === "Diarsipkan"))} />
       </div>
 
-      <ActivityChart onDateClick={handleChartClick} />
+      <ActivityChart onDateClick={handleChartClick} onStatusClick={handleStatusClick} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-xl border border-border p-6">
@@ -406,7 +417,7 @@ function PersetujuanTab({ documents, canApprove, approveDocument, rejectDocument
                       onClick={() => setApproveId(doc.id)}
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-sakura-success text-white text-xs font-semibold hover:opacity-90 transition-opacity"
                     >
-                      <CheckCircle size={14} /> Approve
+                      <CheckCircle size={14} /> Setujui
                     </button>
                     <button
                       onClick={() => setRejectId(doc.id)}

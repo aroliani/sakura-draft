@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sun, Moon, Monitor, Type, Globe, Bell, Eye, Camera, FolderTree, Shield, RotateCcw, Download, ChevronRight } from "lucide-react";
+import { Sun, Moon, Monitor, Type, Globe, Bell, Eye, Camera, FolderTree, Shield, RotateCcw, ChevronRight } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useApp } from "@/contexts/AppContext";
@@ -14,18 +14,18 @@ const SECTIONS = [
   { id: "scan", label: "Scan & Upload", icon: Camera },
   { id: "folder", label: "Folder Mapping", icon: FolderTree },
   { id: "security", label: "Privacy & Security", icon: Shield },
-  { id: "reset", label: "Reset & Export", icon: RotateCcw },
+  { id: "reset", label: "Reset Sistem", icon: RotateCcw },
 ];
 
 export default function SettingsPage() {
-  const { settings, updateSettings, updateNotifications, updateViewer, updateScan, updateFolderMapping, updateSecurity, resetToDefault, exportPreferences } = useSettings();
+  const { settings, updateSettings, updateNotifications, updateViewer, updateScan, updateFolderMapping, updateSecurity, resetToDefault } = useSettings();
   const { currentUser } = useApp();
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState("tema");
   const isAdmin = currentUser.role === "Admin/TU";
 
   const Card = ({ children, title, icon: Icon }: { children: React.ReactNode; title: string; icon: React.ElementType }) => (
-    <div className="bg-card border border-border rounded-xl p-6">
+    <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
       <h3 className="font-bold text-foreground mb-4 flex items-center gap-2"><Icon size={18} className="text-primary" /> {title}</h3>
       {children}
     </div>
@@ -120,7 +120,6 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-3">Label antarmuka akan berubah. Konten dokumen tetap sesuai aslinya.</p>
           </Card>
         );
 
@@ -135,17 +134,6 @@ export default function SettingsPage() {
               <Toggle label="Dokumen disetujui" checked={settings.notifications.approve} onChange={(v) => updateNotifications({ approve: v })} />
               <Toggle label="Dokumen ditolak" checked={settings.notifications.reject} onChange={(v) => updateNotifications({ reject: v })} />
               <Toggle label="Folder dibagikan" checked={settings.notifications.folderShare} onChange={(v) => updateNotifications({ folderShare: v })} />
-              <div className="pt-3">
-                <label className="block text-sm font-medium text-foreground mb-1">Frekuensi</label>
-                <select
-                  value={settings.notifications.frequency}
-                  onChange={(e) => updateNotifications({ frequency: e.target.value as "realtime" | "daily" })}
-                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
-                >
-                  <option value="realtime">Real-time</option>
-                  <option value="daily">Rangkuman harian</option>
-                </select>
-              </div>
             </div>
           </Card>
         );
@@ -268,20 +256,12 @@ export default function SettingsPage() {
 
       case "reset":
         return (
-          <Card title="Reset & Export" icon={RotateCcw}>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-3">Export semua preferensi dalam format JSON untuk backup atau migrasi.</p>
-                <button onClick={() => { exportPreferences(); toast({ title: "Preferensi diekspor", description: "File JSON telah diunduh." }); }} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
-                  <Download size={16} /> Export Preferensi (JSON)
-                </button>
-              </div>
-              <div className="border-t border-border pt-4">
-                <p className="text-sm text-muted-foreground mb-3">Reset semua pengaturan ke nilai default. Tindakan ini tidak dapat dibatalkan.</p>
-                <button onClick={() => { resetToDefault(); toast({ title: "Pengaturan direset", description: "Semua preferensi dikembalikan ke default." }); }} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity">
-                  <RotateCcw size={16} /> Reset ke Default
-                </button>
-              </div>
+          <Card title="Reset Sistem" icon={RotateCcw}>
+            <div>
+              <p className="text-sm text-muted-foreground mb-4">Reset semua pengaturan ke nilai default. Tindakan ini tidak dapat dibatalkan.</p>
+              <button onClick={() => { resetToDefault(); toast({ title: "Pengaturan direset", description: "Semua preferensi dikembalikan ke default." }); }} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+                <RotateCcw size={16} /> Reset ke Default
+              </button>
             </div>
           </Card>
         );
@@ -294,26 +274,28 @@ export default function SettingsPage() {
   return (
     <>
       <AppHeader title="Pengaturan Sistem" subtitle="Kelola preferensi dan konfigurasi akun Anda" />
-      <div className="flex flex-1 animate-fade-in overflow-hidden">
+      <div className="flex flex-col sm:flex-row flex-1 animate-fade-in overflow-hidden">
         {/* Sidebar nav */}
-        <div className="w-64 shrink-0 border-r border-border bg-card p-4 space-y-1 overflow-y-auto">
-          {SECTIONS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveSection(id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                activeSection === id ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-              }`}
-            >
-              <Icon size={16} className={activeSection === id ? "text-primary" : "text-muted-foreground"} />
-              <span className="flex-1 text-left">{label}</span>
-              {activeSection === id && <ChevronRight size={14} className="text-primary" />}
-            </button>
-          ))}
+        <div className="w-full sm:w-64 shrink-0 border-b sm:border-b-0 sm:border-r border-border bg-card p-4 space-y-1 overflow-x-auto sm:overflow-y-auto">
+          <div className="flex sm:flex-col gap-1">
+            {SECTIONS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveSection(id)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeSection === id ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <Icon size={16} className={activeSection === id ? "text-primary" : "text-muted-foreground"} />
+                <span className="flex-1 text-left">{label}</span>
+                {activeSection === id && <ChevronRight size={14} className="text-primary hidden sm:block" />}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
           <div className="max-w-2xl">{renderSection()}</div>
         </div>
       </div>

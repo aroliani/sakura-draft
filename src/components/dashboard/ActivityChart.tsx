@@ -1,17 +1,26 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { CHART_DATA } from "@/data/mockData";
+import { CHART_DATA, CHART_DATA_MONTHLY } from "@/data/mockData";
 import { useState } from "react";
 
 interface Props {
   onDateClick: (date: string) => void;
+  onStatusClick?: (status: string) => void;
 }
 
-export default function ActivityChart({ onDateClick }: Props) {
-  const data = CHART_DATA.labels.map((label, i) => ({
+type Period = "weekly" | "monthly";
+
+export default function ActivityChart({ onDateClick, onStatusClick }: Props) {
+  const [period, setPeriod] = useState<Period>("weekly");
+
+  const source = period === "weekly" ? CHART_DATA : CHART_DATA_MONTHLY;
+
+  const data = source.labels.map((label, i) => ({
     name: label,
-    date: CHART_DATA.dates[i],
-    Upload: CHART_DATA.uploads[i],
-    Persetujuan: CHART_DATA.approvals[i],
+    date: source.dates[i],
+    Upload: source.uploads[i],
+    Disetujui: source.disetujui[i],
+    Ditolak: source.ditolak[i],
+    Menunggu: source.menunggu[i],
   }));
 
   const handleClick = (payload: any) => {
@@ -20,14 +29,38 @@ export default function ActivityChart({ onDateClick }: Props) {
     }
   };
 
+  const handleLegendClick = (e: any) => {
+    if (onStatusClick && e?.value) {
+      onStatusClick(e.value);
+    }
+  };
+
   return (
-    <div className="bg-card rounded-xl border border-border p-6">
-      <h3 className="text-lg font-bold text-foreground mb-1">📈 Aktivitas Mingguan</h3>
-      <p className="text-xs text-muted-foreground mb-4">Klik pada titik grafik untuk melihat dokumen pada hari tersebut</p>
+    <div className="bg-card rounded-xl border border-border p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground">📈 Aktivitas {period === "weekly" ? "Mingguan" : "Bulanan"}</h3>
+          <p className="text-xs text-muted-foreground">Klik pada titik grafik untuk melihat dokumen, klik legend untuk filter status</p>
+        </div>
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
+          <button
+            onClick={() => setPeriod("weekly")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${period === "weekly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            Mingguan
+          </button>
+          <button
+            onClick={() => setPeriod("monthly")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${period === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            Bulanan
+          </button>
+        </div>
+      </div>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data} onClick={handleClick} style={{ cursor: "pointer" }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(350 15% 90%)" />
-          <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="hsl(0 0% 49%)" />
+          <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(0 0% 49%)" />
           <YAxis tick={{ fontSize: 12 }} stroke="hsl(0 0% 49%)" />
           <Tooltip
             contentStyle={{
@@ -37,9 +70,11 @@ export default function ActivityChart({ onDateClick }: Props) {
               fontSize: "13px",
             }}
           />
-          <Legend />
-          <Line type="monotone" dataKey="Upload" stroke="hsl(352 48% 28%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(352 48% 28%)" }} activeDot={{ r: 7 }} />
-          <Line type="monotone" dataKey="Persetujuan" stroke="hsl(155 54% 40%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(155 54% 40%)" }} activeDot={{ r: 7 }} />
+          <Legend onClick={handleLegendClick} wrapperStyle={{ cursor: "pointer" }} />
+          <Line type="monotone" dataKey="Upload" stroke="hsl(352 48% 28%)" strokeWidth={2} dot={{ r: 4, fill: "hsl(352 48% 28%)" }} activeDot={{ r: 6 }} />
+          <Line type="monotone" dataKey="Disetujui" stroke="hsl(155 54% 40%)" strokeWidth={2} dot={{ r: 4, fill: "hsl(155 54% 40%)" }} activeDot={{ r: 6 }} />
+          <Line type="monotone" dataKey="Ditolak" stroke="hsl(0 84% 60%)" strokeWidth={2} dot={{ r: 4, fill: "hsl(0 84% 60%)" }} activeDot={{ r: 6 }} />
+          <Line type="monotone" dataKey="Menunggu" stroke="hsl(35 86% 59%)" strokeWidth={2} dot={{ r: 4, fill: "hsl(35 86% 59%)" }} activeDot={{ r: 6 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
