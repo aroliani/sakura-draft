@@ -102,10 +102,9 @@ function OverviewTab({ visibleDocs, onOpenList, onSelectDoc }: {
     let matched = visibleDocs.filter((d) => d.tanggalUpload.startsWith(date));
     if (status && status !== "Upload") {
       const statusMap: Record<string, string[]> = {
-        "Disetujui": ["Disetujui"],
+        "Disetujui": ["Disetujui", "Diarsipkan"],
         "Ditolak": ["Ditolak"],
         "Menunggu": ["Menunggu"],
-        "Diarsipkan": ["Diarsipkan"],
       };
       const allowedStatuses = statusMap[status] || [];
       matched = matched.filter((d) => allowedStatuses.includes(d.status));
@@ -115,12 +114,12 @@ function OverviewTab({ visibleDocs, onOpenList, onSelectDoc }: {
   };
 
   const handleStatusClick = (status: string) => {
-    const statusMap: Record<string, string> = { "Disetujui": "Disetujui", "Ditolak": "Ditolak", "Menunggu": "Menunggu", "Diarsipkan": "Diarsipkan", "Upload": "all" };
+    const statusMap: Record<string, string> = { "Disetujui": "Disetujui", "Ditolak": "Ditolak", "Menunggu": "Menunggu", "Upload": "all" };
     const key = statusMap[status];
     if (key === "all") {
       onOpenList(`Semua Dokumen (Upload)`, visibleDocs);
     } else if (key) {
-      onOpenList(`Dokumen ${status}`, visibleDocs.filter((d) => d.status === key));
+      onOpenList(`Dokumen ${status}`, visibleDocs.filter((d) => d.status === key || (key === "Disetujui" && d.status === "Diarsipkan")));
     }
   };
 
