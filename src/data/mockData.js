@@ -342,6 +342,7 @@ export function buildFolderTree(documents) {
           category_id: root.category_id,
           type_id: child.type_id,
           tahunAjaran: year,
+          description: "",
           children: [],
         }));
         return {
@@ -350,6 +351,7 @@ export function buildFolderTree(documents) {
           folder_id: child.folder_id,
           category_id: root.category_id,
           type_id: child.type_id,
+          description: child.description || "",
           children: yearChildren,
         };
       }
@@ -359,6 +361,7 @@ export function buildFolderTree(documents) {
         folder_id: child.folder_id,
         category_id: root.category_id,
         type_id: child.type_id,
+        description: child.description || "",
         children: [],
       };
     });
@@ -368,6 +371,7 @@ export function buildFolderTree(documents) {
       path: `cat:${root.category_id}`,
       folder_id: root.folder_id,
       category_id: root.category_id,
+      description: root.description || "",
       children: childNodes,
     });
   });

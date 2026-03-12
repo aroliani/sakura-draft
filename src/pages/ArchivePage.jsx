@@ -216,6 +216,23 @@ export default function ArchivePage() {
   // Close context menu on click outside
   const handlePageClick = () => setContextMenu(null);
 
+  // Find folder node for description
+  const findFolderNode = (nodes, targetPath) => {
+    for (const node of nodes) {
+      if (node.path === targetPath) return node;
+      if (node.children) {
+        const found = findFolderNode(node.children, targetPath);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const selectedFolderNode = useMemo(() => {
+    if (!selectedFolder) return null;
+    return findFolderNode(folderTree, selectedFolder);
+  }, [selectedFolder, folderTree]);
+
   const renderFolder = (folder, depth = 0) => {
     const isExpanded = expandedFolders.has(folder.path);
     const hasChildren = folder.children.length > 0;
@@ -225,32 +242,42 @@ export default function ArchivePage() {
     return (
       <div key={folder.path}>
         <div className="group flex items-center" style={{ paddingLeft: `${12 + depth * 20}px` }}>
-          <button
-            onClick={() => {
-              if (hasChildren) toggleExpand(folder.path);
-              setSelectedFolder(folder.path);
-              setShowFavorites(false);
-              setPreviewDoc(null);
-            }}
-            className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-0 ${
-              isSelected ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            {hasChildren ? (
-              isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />
-            ) : (
-              <span className="w-3.5 shrink-0" />
-            )}
-            {isExpanded && hasChildren ? (
-              <FolderOpen size={16} className="text-sakura-warning shrink-0" />
-            ) : (
-              <Folder size={16} className={`shrink-0 ${hasChildren ? "text-muted-foreground" : "text-sakura-warning"}`} />
-            )}
-            <span className="truncate">{folder.name}</span>
-            {docCount > 0 && (
-              <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">{docCount}</span>
-            )}
-          </button>
+          <TooltipProvider delayDuration={400}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => {
+                    if (hasChildren) toggleExpand(folder.path);
+                    setSelectedFolder(folder.path);
+                    setShowFavorites(false);
+                    setPreviewDoc(null);
+                  }}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-0 ${
+                    isSelected ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {hasChildren ? (
+                    isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />
+                  ) : (
+                    <span className="w-3.5 shrink-0" />
+                  )}
+                  {isExpanded && hasChildren ? (
+                    <FolderOpen size={16} className="text-sakura-warning shrink-0" />
+                  ) : (
+                    <Folder size={16} className={`shrink-0 ${hasChildren ? "text-muted-foreground" : "text-sakura-warning"}`} />
+                  )}
+                  <span className="whitespace-nowrap">{folder.name}</span>
+                  {docCount > 0 && (
+                    <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">{docCount}</span>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="max-w-[220px]">
+                <p className="font-semibold text-xs">{folder.name}</p>
+                {folder.description && <p className="text-xs text-muted-foreground mt-0.5">{folder.description}</p>}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {isAdmin && (
             <button
               onClick={(e) => {
