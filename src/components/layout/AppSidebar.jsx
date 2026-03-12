@@ -24,18 +24,9 @@ export default function AppSidebar() {
   return (
     <aside className={`${collapsed ? "w-[72px]" : "w-[190px]"} min-h-screen bg-sidebar flex flex-col shrink-0 transition-all duration-300`}>
       {/* Header — grid: collapse icon | logo */}
-      <div className="px-3 pt-4 pb-3">
-        <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2"}`}>
-          <button
-            onClick={() => navigate("/home")}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer min-w-0"
-          >
-            <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-full bg-sidebar-accent shrink-0" />
-            {!collapsed && (
-              <div className="text-sidebar-primary font-bold text-sm leading-tight tracking-wide">SAKURA</div>
-            )}
-          </button>
-          {!collapsed && <div className="flex-1" />}
+      <div className="px-3 pt-3 pb-3 space-y-2">
+        {/* Collapse button - top row */}
+        <div className={`flex ${collapsed ? "justify-center" : "justify-end"}`}>
           <button
             onClick={() => setCollapsed(!collapsed)}
             title={collapsed ? "Perluas sidebar" : "Sembunyikan sidebar"}
@@ -45,15 +36,16 @@ export default function AppSidebar() {
           </button>
         </div>
 
-        {/* Logo centered when collapsed */}
-        {collapsed && (
-          <button
-            onClick={() => navigate("/home")}
-            className="mt-2 flex justify-center hover:opacity-80 transition-opacity cursor-pointer"
-          >
-            <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-full bg-sidebar-accent" />
-          </button>
-        )}
+        {/* Logo + SAKURA */}
+        <button
+          onClick={() => navigate("/home")}
+          className={`flex items-center hover:opacity-80 transition-opacity cursor-pointer ${collapsed ? "justify-center" : "gap-2"}`}
+        >
+          <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-full bg-sidebar-accent shrink-0" />
+          {!collapsed && (
+            <div className="text-sidebar-primary font-bold text-sm leading-tight tracking-wide">SAKURA</div>
+          )}
+        </button>
       </div>
 
       {/* Divider */}
