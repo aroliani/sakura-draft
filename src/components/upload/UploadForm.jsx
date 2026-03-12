@@ -18,6 +18,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
   const fileRef = useRef(null);
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
+  const [scanPageImages, setScanPageImages] = useState([]); // scanned page images for validation preview
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
