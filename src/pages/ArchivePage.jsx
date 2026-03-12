@@ -96,7 +96,7 @@ export default function ArchivePage() {
   };
 
   const filtered = useMemo(() => {
-    let docs = documents;
+    let docs = accessibleDocuments;
     if (showFavorites) docs = docs.filter((d) => d.favorite);
     if (selectedFolder) docs = docs.filter((d) => docMatchesFolder(d, selectedFolder));
     if (statusFilter !== "Semua") docs = docs.filter((d) => d.status === statusFilter);
