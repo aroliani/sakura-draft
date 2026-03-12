@@ -1,5 +1,5 @@
-import { useState, useRef, useMemo } from "react";
-import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown, Maximize, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, useMemo, useCallback } from "react";
+import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown, Maximize, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import CameraScanModal from "@/components/scan/CameraScanModal";
 import { useApp } from "@/contexts/AppContext";
 
@@ -28,6 +28,25 @@ export default function UploadForm({ onSuccess, onCancel }) {
   const [fullPreviewZoom, setFullPreviewZoom] = useState(100);
   const [fullPreviewPage, setFullPreviewPage] = useState(0);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
+  // Rotate a scanned page by 90° CW using canvas (modifies actual image data)
+  const rotatePage = useCallback((pageIndex) => {
+    const src = scanPageImages[pageIndex];
+    if (!src) return;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.height;
+      canvas.height = img.width;
+      const ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+      const rotated = canvas.toDataURL("image/jpeg", 0.92);
+      setScanPageImages((prev) => prev.map((p, i) => (i === pageIndex ? rotated : p)));
+    };
+    img.src = src;
+  }, [scanPageImages]);
   const [selectedTypeId, setSelectedTypeId] = useState(null);
 
   const [form, setForm] = useState({
@@ -284,11 +303,16 @@ export default function UploadForm({ onSuccess, onCancel }) {
                   <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
                     {scanPageImages.map((imgSrc, i) => (
                       <div key={i} className="relative border border-border rounded-lg overflow-hidden bg-background shadow-sm">
-                        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border/50 bg-muted/20">
-                          <FileText size={11} className="text-primary" />
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Halaman {i + 1} dari {scanPageImages.length}
-                          </span>
+                        <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/50 bg-muted/20">
+                          <div className="flex items-center gap-2">
+                            <FileText size={11} className="text-primary" />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              Halaman {i + 1} dari {scanPageImages.length}
+                            </span>
+                          </div>
+                          <button type="button" onClick={() => rotatePage(i)} className="p-1 rounded hover:bg-muted transition-colors" title="Putar 90°">
+                            <RotateCw size={13} className="text-muted-foreground" />
+                          </button>
                         </div>
                         <div className="p-3">
                           <img
@@ -333,6 +357,12 @@ export default function UploadForm({ onSuccess, onCancel }) {
                       <button type="button" disabled={fullPreviewPage <= 0} onClick={() => setFullPreviewPage((p) => p - 1)} className="p-2 rounded hover:bg-muted disabled:opacity-30"><ChevronLeft size={18} /></button>
                       <span className="text-sm text-muted-foreground whitespace-nowrap">Halaman {fullPreviewPage + 1} / {scanPageImages.length}</span>
                       <button type="button" disabled={fullPreviewPage >= scanPageImages.length - 1} onClick={() => setFullPreviewPage((p) => p + 1)} className="p-2 rounded hover:bg-muted disabled:opacity-30"><ChevronRight size={18} /></button>
+                      <div className="w-px h-6 bg-border mx-1" />
+                    </>
+                  )}
+                  {scanPageImages.length > 0 && (
+                    <>
+                      <button type="button" onClick={() => rotatePage(fullPreviewPage)} className="p-2 rounded hover:bg-muted" title="Putar 90°"><RotateCw size={18} /></button>
                       <div className="w-px h-6 bg-border mx-1" />
                     </>
                   )}
