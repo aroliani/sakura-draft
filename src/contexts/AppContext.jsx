@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef } from "react";
-import { USERS, DOCUMENTS, ROLE_PERMISSIONS, INITIAL_NOTIFICATIONS, DOCUMENT_TYPES, CATEGORIES, FOLDERS, INITIAL_DOCUMENT_COUNTERS } from "@/data/mockData.js";
+import { USERS, DOCUMENTS, ROLE_PERMISSIONS, INITIAL_NOTIFICATIONS, DOCUMENT_TYPES, INITIAL_DOCUMENT_COUNTERS } from "@/data/mockData.js";
 
 const AppContext = createContext(null);
 
@@ -40,12 +40,7 @@ export const AppProvider = ({ children }) => {
     return `${prefix}/${year}/${String(nextSeq).padStart(3, "0")}`;
   };
 
-  const getFolderForCategory = (categoryId) => {
-    const cat = CATEGORIES.find((c) => c.category_id === categoryId);
-    if (!cat) return null;
-    const folder = FOLDERS.find((f) => f.folder_name === cat.category_name);
-    return folder || null;
-  };
+  // getFolderForCategory removed — folder mapping now handled by getFolderIdForDocument in mockData
 
   const login = (email) => {
     const user = users.find((u) => u.email === email);
@@ -186,7 +181,7 @@ export const AppProvider = ({ children }) => {
       login, logout, updateUserRole, updateUserAvatar, togglePermission, addAuditNote,
       hasPermission, approveDocument, rejectDocument, uploadDocument, archiveDocument,
       toggleFavorite, markNotificationRead, markAllNotificationsRead,
-      addUser, updateUser, deleteUser, generateDocumentNumber, getFolderForCategory,
+      addUser, updateUser, deleteUser, generateDocumentNumber,
     }}>
       {children}
     </AppContext.Provider>
