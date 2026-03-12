@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown, Maximize, ZoomIn, ZoomOut } from "lucide-react";
 import CameraScanModal from "@/components/scan/CameraScanModal";
 import { useApp } from "@/contexts/AppContext";
@@ -7,10 +7,10 @@ import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { CATEGORIES, DOCUMENT_TYPES, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, getAutoFolderPath, getFolderIdForDocument } from "@/data/mockData";
+import { CATEGORIES, DOCUMENT_TYPES, TAHUN_AJARAN_OPTIONS, CATEGORY_FORM_FIELDS, SURAT_TYPE_FORM_FIELDS, getAutoFolderPath, getFolderIdForDocument } from "@/data/mockData";
 import { Calendar } from "@/components/ui/calendar";
 
-export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
+export default function UploadForm({ onSuccess, onCancel }) {
   const { uploadDocument, currentUser, generateDocumentNumber } = useApp();
   const { settings } = useSettings();
   const { toast } = useToast();
@@ -25,9 +25,6 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   const [showCameraScan, setShowCameraScan] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [fullPreviewZoom, setFullPreviewZoom] = useState(100);
-  const [showDetailFields, setShowDetailFields] = useState(false);
-  const [customTahun, setCustomTahun] = useState("");
-  const [detailData, setDetailData] = useState({});
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedTypeId, setSelectedTypeId] = useState(null);
 
@@ -36,30 +33,37 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
     judul: "",
     jenisDokumen: "",
     kategori: "",
-    kelas: "",
-    namaSiswa: "",
-    nisn: "",
-    tahunAjaran: "2024/2025",
     catatan: "",
     tanggalUpload: new Date(),
-    folderTujuan: "",
   });
+
+  // Dynamic metadata fields state (category-specific data)
+  const [metaData, setMetaData] = useState({});
 
   const jenisOptions = useMemo(() => {
     if (!selectedCategoryId) return [];
     return DOCUMENT_TYPES.filter((t) => t.category_id === selectedCategoryId);
   }, [selectedCategoryId]);
 
-  const detailFields = useMemo(() => {
-    return KATEGORI_DETAIL_FIELDS[form.kategori] || [];
-  }, [form.kategori]);
+  // Get dynamic fields based on category and type
+  const dynamicFields = useMemo(() => {
+    if (!selectedCategoryId || !selectedTypeId) return [];
+    // Surat Menyurat has type-specific fields
+    if (selectedCategoryId === 4) {
+      return SURAT_TYPE_FORM_FIELDS[selectedTypeId] || [];
+    }
+    return CATEGORY_FORM_FIELDS[selectedCategoryId] || [];
+  }, [selectedCategoryId, selectedTypeId]);
 
-  // Auto-update folder path when category, type, or tahun changes
+  // Check if both category and type are selected
+  const hasSelection = selectedCategoryId && selectedTypeId;
+
+  // Auto folder display
   const autoFolderDisplay = useMemo(() => {
     if (!selectedCategoryId || !selectedTypeId) return "";
-    const tahun = form.tahunAjaran === "Lainnya" ? customTahun : form.tahunAjaran;
+    const tahun = metaData.tahunAjaran || "";
     return getAutoFolderPath(selectedCategoryId, selectedTypeId, tahun);
-  }, [selectedCategoryId, selectedTypeId, form.tahunAjaran, customTahun]);
+  }, [selectedCategoryId, selectedTypeId, metaData.tahunAjaran]);
 
   const handleFile = (f) => {
     const maxSize = 10 * 1024 * 1024;
@@ -96,7 +100,6 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   };
 
   const confirmUpload = () => {
-    const tahun = form.tahunAjaran === "Lainnya" ? customTahun : form.tahunAjaran;
     const folderId = getFolderIdForDocument(selectedCategoryId, selectedTypeId);
 
     uploadDocument({
@@ -106,12 +109,15 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
       category_id: selectedCategoryId,
       type_id: selectedTypeId,
       folder_id: folderId,
-      kelas: form.kelas || "-",
-      class_info: form.kelas || "-",
       jenisDokumen: form.jenisDokumen,
-      namaSiswa: form.namaSiswa,
-      nisn: form.nisn,
-      tahunAjaran: tahun,
+      // Spread category-specific metadata
+      ...metaData,
+      // Map common fields for backward compat
+      kelas: metaData.kelas || "-",
+      class_info: metaData.kelas || "-",
+      namaSiswa: metaData.namaSiswa || "",
+      nisn: metaData.nisn || "",
+      tahunAjaran: metaData.tahunAjaran || "",
       pengunggah: { id: currentUser.id, nama: currentUser.nama, role: currentUser.role, avatar: currentUser.avatar },
       tanggalUpload: form.tanggalUpload.toISOString(),
       fileUrl: filePreview || "/mock/sample.pdf",
@@ -135,16 +141,12 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
     setTimeout(() => {
       setFile(null);
       setFilePreview(null);
-      setDetailData({});
-      setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", kelas: "", namaSiswa: "", nisn: "", tahunAjaran: "2024/2025", catatan: "", tanggalUpload: new Date(), folderTujuan: "" });
+      setMetaData({});
+      setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", catatan: "", tanggalUpload: new Date() });
       setSelectedCategoryId(null);
       setSelectedTypeId(null);
       onSuccess?.();
     }, 1000);
-  };
-
-  const handleScanCamera = () => {
-    setShowCameraScan(true);
   };
 
   const handleScanComplete = (scannedFile) => {
@@ -153,6 +155,71 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   };
 
   const update = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+  const updateMeta = (key, val) => setMetaData((p) => ({ ...p, [key]: val }));
+
+  // Render a single dynamic field
+  const renderField = (field) => {
+    if (field.type === "tahun_ajaran") {
+      return (
+        <div key={field.key}>
+          <label className="block text-sm font-medium text-foreground mb-1">{field.label}</label>
+          <select value={metaData[field.key] || "2024/2025"} onChange={(e) => updateMeta(field.key, e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            {TAHUN_AJARAN_OPTIONS.map((t) => <option key={t}>{t}</option>)}
+            <option value="Lainnya">Lainnya</option>
+          </select>
+          {metaData[field.key] === "Lainnya" && (
+            <input value={metaData[`${field.key}_custom`] || ""} onChange={(e) => updateMeta(`${field.key}_custom`, e.target.value)} placeholder="Contoh: 2026/2027" className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+          )}
+        </div>
+      );
+    }
+    if (field.type === "select" && field.options) {
+      return (
+        <div key={field.key}>
+          <label className="block text-sm font-medium text-foreground mb-1">{field.label}{field.required ? " *" : ""}</label>
+          <select value={metaData[field.key] || ""} onChange={(e) => updateMeta(field.key, e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            <option value="">Pilih {field.label.toLowerCase()}</option>
+            {field.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+          </select>
+        </div>
+      );
+    }
+    if (field.type === "date") {
+      return (
+        <div key={field.key}>
+          <label className="block text-sm font-medium text-foreground mb-1">{field.label}{field.required ? " *" : ""}</label>
+          <input type="date" value={metaData[field.key] || ""} onChange={(e) => updateMeta(field.key, e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+        </div>
+      );
+    }
+    if (field.type === "number") {
+      return (
+        <div key={field.key}>
+          <label className="block text-sm font-medium text-foreground mb-1">{field.label}{field.required ? " *" : ""}</label>
+          <input type="number" value={metaData[field.key] || ""} onChange={(e) => updateMeta(field.key, e.target.value)} placeholder={field.placeholder} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+        </div>
+      );
+    }
+    // Default: text input
+    return (
+      <div key={field.key}>
+        <label className="block text-sm font-medium text-foreground mb-1">{field.label}{field.required ? " *" : ""}</label>
+        <input value={metaData[field.key] || ""} onChange={(e) => updateMeta(field.key, e.target.value)} placeholder={field.placeholder} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+      </div>
+    );
+  };
+
+  // Get category-specific section title
+  const getCategorySectionTitle = () => {
+    if (selectedCategoryId === 1) return "Data Siswa";
+    if (selectedCategoryId === 2) return "Data Guru";
+    if (selectedCategoryId === 3) return "Data Inventaris";
+    if (selectedCategoryId === 4) {
+      const docType = DOCUMENT_TYPES.find((t) => t.type_id === selectedTypeId);
+      return `Data ${docType?.type_name || "Surat"}`;
+    }
+    return "Data Tambahan";
+  };
 
   return (
     <>
@@ -180,7 +247,7 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
             </div>
             <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
 
-            <button type="button" onClick={handleScanCamera} className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors">
+            <button type="button" onClick={() => setShowCameraScan(true)} className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors">
               <Camera size={18} /> Scan via Kamera
             </button>
 
@@ -238,81 +305,64 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
           )}
         </div>
 
-        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
-          <h3 className="font-bold text-foreground mb-4">Data Dokumen</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen</label>
-              <input readOnly value={form.nomorDokumen} placeholder="Otomatis setelah memilih jenis dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
-              <input required value={form.judul} onChange={(e) => update("judul", e.target.value)} placeholder="Contoh: Ijazah SMP" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Kategori Dokumen *</label>
-              <select required value={selectedCategoryId || ""} onChange={(e) => {
-                const catId = Number(e.target.value);
-                const cat = CATEGORIES.find((c) => c.category_id === catId);
-                setSelectedCategoryId(catId || null);
-                setSelectedTypeId(null);
-                update("kategori", cat?.category_name || "");
-                update("jenisDokumen", "");
-                update("nomorDokumen", "");
-              }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-                <option value="">Pilih kategori</option>
-                {CATEGORIES.map((c) => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Jenis Dokumen *</label>
-              <select required value={selectedTypeId || ""} onChange={(e) => {
-                const typeId = Number(e.target.value);
-                const docType = DOCUMENT_TYPES.find((t) => t.type_id === typeId);
-                setSelectedTypeId(typeId || null);
-                update("jenisDokumen", docType?.type_name || "");
-                if (typeId) {
-                  const docNum = generateDocumentNumber(typeId);
-                  update("nomorDokumen", docNum);
-                }
-              }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!selectedCategoryId}>
-                <option value="">{selectedCategoryId ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
-                {jenisOptions.map((t) => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Masukkan ke Folder</label>
-              <input readOnly value={autoFolderDisplay || "Otomatis berdasarkan kategori & jenis dokumen"} className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Kelas</label>
-              <input value={form.kelas} onChange={(e) => update("kelas", e.target.value)} placeholder="Contoh: Kelas 7A / Alumni 2024" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-6">
+          {/* Core document fields - always visible */}
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+            <h3 className="font-bold text-foreground mb-4">Data Dokumen</h3>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Nama Siswa</label>
-                <input value={form.namaSiswa} onChange={(e) => update("namaSiswa", e.target.value)} placeholder="Nama lengkap" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen</label>
+                <input readOnly value={form.nomorDokumen} placeholder="Otomatis setelah memilih jenis dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">NISN</label>
-                <input value={form.nisn} onChange={(e) => update("nisn", e.target.value)} placeholder="00xxxxxxxx" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
+                <input required value={form.judul} onChange={(e) => update("judul", e.target.value)} placeholder="Contoh: Ijazah SMP Ahmad Rizki" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Tahun Ajaran</label>
-                <select value={form.tahunAjaran} onChange={(e) => update("tahunAjaran", e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-                  {TAHUN_AJARAN_OPTIONS.map((t) => <option key={t}>{t}</option>)}
-                  <option value="Lainnya">Lainnya</option>
+                <label className="block text-sm font-medium text-foreground mb-1">Kategori Dokumen *</label>
+                <select required value={selectedCategoryId || ""} onChange={(e) => {
+                  const catId = Number(e.target.value);
+                  const cat = CATEGORIES.find((c) => c.category_id === catId);
+                  setSelectedCategoryId(catId || null);
+                  setSelectedTypeId(null);
+                  setMetaData({});
+                  update("kategori", cat?.category_name || "");
+                  update("jenisDokumen", "");
+                  update("nomorDokumen", "");
+                }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                  <option value="">Pilih kategori</option>
+                  {CATEGORIES.map((c) => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
                 </select>
-                {form.tahunAjaran === "Lainnya" && (
-                  <input value={customTahun} onChange={(e) => setCustomTahun(e.target.value)} placeholder="Contoh: 2026/2027" className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                )}
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Jenis Dokumen *</label>
+                <select required value={selectedTypeId || ""} onChange={(e) => {
+                  const typeId = Number(e.target.value);
+                  const docType = DOCUMENT_TYPES.find((t) => t.type_id === typeId);
+                  setSelectedTypeId(typeId || null);
+                  setMetaData({});
+                  update("jenisDokumen", docType?.type_name || "");
+                  if (typeId) {
+                    const docNum = generateDocumentNumber(typeId);
+                    update("nomorDokumen", docNum);
+                  }
+                }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!selectedCategoryId}>
+                  <option value="">{selectedCategoryId ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
+                  {jenisOptions.map((t) => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
+                </select>
+              </div>
+
+              {/* Folder auto-mapping - only after both selected */}
+              {hasSelection && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Masukkan ke Folder</label>
+                  <input readOnly value={autoFolderDisplay || "Menentukan..."} className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
+                </div>
+              )}
+
+              {/* Tanggal Upload - always visible */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Tanggal Upload</label>
                 <div className="relative">
@@ -325,40 +375,35 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
                   )}
                 </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Catatan (opsional)</label>
-              <textarea value={form.catatan} onChange={(e) => update("catatan", e.target.value)} placeholder="Catatan tambahan jika ada" rows={3} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
-            </div>
-
-            {detailFields.length > 0 && (
               <div>
-                <button type="button" onClick={() => setShowDetailFields(!showDetailFields)} className="flex items-center gap-2 text-sm font-medium text-primary hover:underline">
-                  <ChevronDown size={14} className={`transition-transform ${showDetailFields ? "rotate-180" : ""}`} />
-                  Tambah Data Detail (Opsional)
-                </button>
-                {showDetailFields && (
-                  <div className="mt-3 space-y-3 p-4 rounded-lg border border-border bg-muted/20">
-                    {detailFields.map((field) => (
-                      <div key={field.key}>
-                        <label className="block text-sm font-medium text-foreground mb-1">{field.label}</label>
-                        <input value={detailData[field.key] || ""} onChange={(e) => setDetailData((p) => ({ ...p, [field.key]: e.target.value }))} placeholder={field.placeholder} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <label className="block text-sm font-medium text-foreground mb-1">Catatan (opsional)</label>
+                <textarea value={form.catatan} onChange={(e) => update("catatan", e.target.value)} placeholder="Catatan tambahan jika ada" rows={3} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
               </div>
-            )}
-
-            <div className="flex gap-3">
-              {onCancel && (
-                <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-lg border border-input text-sm font-semibold hover:bg-muted transition-colors">Batal</button>
-              )}
-              <button type="submit" className={`${onCancel ? "flex-1" : "w-full"} flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity`}>
-                <Upload size={18} /> Upload Dokumen
-              </button>
             </div>
+          </div>
+
+          {/* Dynamic category-specific fields - only after both category and type selected */}
+          {hasSelection && dynamicFields.length > 0 && (
+            <div className="bg-card border border-border rounded-xl p-4 sm:p-6 animate-fade-in">
+              <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                <FileText size={18} className="text-primary" />
+                {getCategorySectionTitle()}
+              </h3>
+              <div className="space-y-4">
+                {dynamicFields.map((field) => renderField(field))}
+              </div>
+            </div>
+          )}
+
+          {/* Submit button */}
+          <div className="flex gap-3">
+            {onCancel && (
+              <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-lg border border-input text-sm font-semibold hover:bg-muted transition-colors">Batal</button>
+            )}
+            <button type="submit" className={`${onCancel ? "flex-1" : "w-full"} flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity`}>
+              <Upload size={18} /> Upload Dokumen
+            </button>
           </div>
         </div>
       </form>
@@ -386,8 +431,8 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
 
       {showPdfPreview && <PdfPreviewOverlay onClose={() => setShowPdfPreview(false)} document={{
         id: 0, nomorDokumen: form.nomorDokumen || "DRAFT", judul: form.judul || "Dokumen Baru",
-        kategori: form.kategori || "Umum", kelas: form.kelas || "-", jenisDokumen: form.jenisDokumen,
-        namaSiswa: form.namaSiswa, nisn: form.nisn, tahunAjaran: form.tahunAjaran,
+        kategori: form.kategori || "Umum", kelas: metaData.kelas || "-", jenisDokumen: form.jenisDokumen,
+        namaSiswa: metaData.namaSiswa || "", nisn: metaData.nisn || "", tahunAjaran: metaData.tahunAjaran || "",
         pengunggah: { id: currentUser.id, nama: currentUser.nama, role: currentUser.role, avatar: currentUser.avatar },
         tanggalUpload: new Date().toISOString(), tanggalEdit: new Date().toISOString(),
         status: "Menunggu", versi: 1, fileUrl: "", auditTrail: [],
