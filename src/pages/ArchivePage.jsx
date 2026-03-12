@@ -106,7 +106,7 @@ export default function ArchivePage() {
       docs = docs.filter((d) => d.judul.toLowerCase().includes(q) || d.nomorDokumen.toLowerCase().includes(q) || d.pengunggah.nama.toLowerCase().includes(q));
     }
     return docs;
-  }, [documents, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
+  }, [accessibleDocuments, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
 
   const groupedDocs = useMemo(() => {
     const groups = {};
