@@ -14,7 +14,7 @@ const TABS = [
 ];
 
 export default function DashboardPage() {
-  const { documents, currentUser, hasPermission, approveDocument, rejectDocument, toggleFavorite } = useApp();
+  const { documents, currentUser, hasPermission, approveDocument, rejectDocument } = useApp();
   const [activeTab, setActiveTab] = useState("ringkasan");
   const [listModal, setListModal] = useState(null);
   const [detailDoc, setDetailDoc] = useState(null);
