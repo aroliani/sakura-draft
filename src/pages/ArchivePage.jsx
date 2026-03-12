@@ -1,14 +1,14 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft, Grid2X2, Grid3X3, LayoutGrid, Home, GripVertical } from "lucide-react";
+import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft, Grid2X2, Grid3X3, LayoutGrid, Home, GripVertical } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import AppHeader from "@/components/layout/AppHeader";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
-import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
+
 import UploadForm from "@/components/upload/UploadForm";
 import { useApp } from "@/contexts/AppContext";
 import { useSettings } from "@/contexts/SettingsContext";
-import { buildFolderTree, docMatchesFolder, KATEGORI_OPTIONS } from "@/data/mockData";
+import { buildFolderTree, docMatchesFolder, docMatchesFolderStrict, KATEGORI_OPTIONS } from "@/data/mockData";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -37,7 +37,6 @@ export default function ArchivePage() {
   const [expandedFolders, setExpandedFolders] = useState(new Set());
   const [showFavorites, setShowFavorites] = useState(false);
   const [previewDoc, setPreviewDoc] = useState(null);
-  const [showPdfOverlay, setShowPdfOverlay] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   // CRUD modal states
@@ -96,7 +95,10 @@ export default function ArchivePage() {
   const filtered = useMemo(() => {
     let docs = accessibleDocuments;
     if (showFavorites) docs = docs.filter((d) => d.favorite);
-    if (selectedFolder) docs = docs.filter((d) => docMatchesFolder(d, selectedFolder));
+    if (selectedFolder) {
+      const folderHasChildren = currentSubfolders.length > 0;
+      docs = docs.filter((d) => docMatchesFolderStrict(d, selectedFolder, folderHasChildren));
+    }
     if (statusFilter !== "Semua") docs = docs.filter((d) => d.status === statusFilter);
     if (categoryFilter !== "Semua") docs = docs.filter((d) => d.kategori === categoryFilter);
     if (search) {
@@ -104,7 +106,7 @@ export default function ArchivePage() {
       docs = docs.filter((d) => d.judul.toLowerCase().includes(q) || d.nomorDokumen.toLowerCase().includes(q) || d.pengunggah.nama.toLowerCase().includes(q));
     }
     return docs;
-  }, [accessibleDocuments, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
+  }, [accessibleDocuments, search, statusFilter, categoryFilter, selectedFolder, showFavorites, currentSubfolders]);
 
   const groupedDocs = useMemo(() => {
     const groups = {};
@@ -288,7 +290,6 @@ export default function ArchivePage() {
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-[240px]">
                 <p className="font-semibold text-xs">{folder.name}</p>
-                {folder.description && <p className="text-xs text-muted-foreground mt-0.5 italic">{folder.description}</p>}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -445,9 +446,6 @@ export default function ArchivePage() {
                       "Semua Dokumen Arsip"
                     )}
                   </h2>
-                  {selectedFolderNode?.description && (
-                    <p className="text-xs text-muted-foreground mt-1 italic">Deskripsi: {selectedFolderNode.description}</p>
-                  )}
                   <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} dokumen ditemukan</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -554,7 +552,7 @@ export default function ArchivePage() {
             </div>
           </ResizablePanel>
 
-          {/* Right - Side Preview */}
+          {/* Right - Detail Panel (inline, not floating) */}
           {previewDoc && (
             <>
               <ResizableHandle />
@@ -610,7 +608,7 @@ export default function ArchivePage() {
                         <div className="font-medium text-foreground">{previewDoc.pengunggah.nama}</div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground text-xs">Upload</div>
+                        <div className="text-muted-foreground text-xs">Tanggal Unggah</div>
                         <div className="font-medium text-foreground">{format(new Date(previewDoc.tanggalUpload), "dd/MM/yyyy")}</div>
                       </div>
                     </div>
@@ -623,16 +621,10 @@ export default function ArchivePage() {
 
                     <div className="flex gap-2">
                       <button
-                        onClick={() => setShowPdfOverlay(true)}
+                        onClick={() => setDetailDoc(previewDoc)}
                         className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
                       >
-                        <Eye size={16} /> Preview
-                      </button>
-                      <button
-                        onClick={() => setDetailDoc(previewDoc)}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
-                      >
-                        <FileIcon size={16} /> Detail
+                        <FileIcon size={16} /> Lihat Detail Lengkap
                       </button>
                     </div>
 
@@ -820,7 +812,7 @@ export default function ArchivePage() {
       </AlertDialog>
 
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
-      {showPdfOverlay && previewDoc && <PdfPreviewOverlay onClose={() => setShowPdfOverlay(false)} document={previewDoc} />}
+      
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-8">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowUploadModal(false)} />
