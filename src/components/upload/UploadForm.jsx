@@ -110,16 +110,18 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   };
 
   const confirmUpload = () => {
-    const jenis = form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen;
     const tahun = form.tahunAjaran === "Lainnya" ? customTahun : form.tahunAjaran;
-    const kategori = form.kategori === "Lainnya" ? customKategori : form.kategori;
+    const folder = getFolderForCategory(selectedCategoryId);
 
     uploadDocument({
       nomorDokumen: form.nomorDokumen || `DOC-${Date.now()}`,
       judul: form.judul,
-      kategori: kategori || "Lainnya",
+      kategori: form.kategori || "-",
+      category_id: selectedCategoryId,
+      type_id: selectedTypeId,
+      folder_id: folder?.folder_id || null,
       kelas: form.kelas || "-",
-      jenisDokumen: jenis,
+      jenisDokumen: form.jenisDokumen,
       namaSiswa: form.namaSiswa,
       nisn: form.nisn,
       tahunAjaran: tahun,
