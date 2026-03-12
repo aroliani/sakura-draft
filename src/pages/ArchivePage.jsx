@@ -386,29 +386,37 @@ export default function ArchivePage() {
               </h2>
               <p className="text-sm text-muted-foreground">{filtered.length} dokumen ditemukan</p>
             </div>
-            {/* In-folder actions for admin */}
-            {isAdmin && selectedFolder && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setCreateFolderParent(selectedFolder);
-                    setNewFolderName("");
-                    setNewFolderDesc("");
-                    setShowCreateFolderModal(true);
-                  }}
-                >
-                  <FolderPlus size={14} className="mr-1.5" /> Sub-folder
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setShowUploadModal(true)}
-                >
-                  <FilePlus size={14} className="mr-1.5" /> Upload File
-                </Button>
+            <div className="flex items-center gap-2">
+              {/* Grid size control */}
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+                <button onClick={() => setFolderGridSize("small")} title="Kecil" className={`p-1.5 rounded ${folderGridSize === "small" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid3X3 size={14} /></button>
+                <button onClick={() => setFolderGridSize("medium")} title="Sedang" className={`p-1.5 rounded ${folderGridSize === "medium" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid2X2 size={14} /></button>
+                <button onClick={() => setFolderGridSize("large")} title="Besar" className={`p-1.5 rounded ${folderGridSize === "large" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><LayoutGrid size={14} /></button>
               </div>
-            )}
+              {/* In-folder actions for admin */}
+              {isAdmin && selectedFolder && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCreateFolderParent(selectedFolder);
+                      setNewFolderName("");
+                      setNewFolderDesc("");
+                      setShowCreateFolderModal(true);
+                    }}
+                  >
+                    <FolderPlus size={14} className="mr-1.5" /> Sub-folder
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowUploadModal(true)}
+                  >
+                    <FilePlus size={14} className="mr-1.5" /> Upload File
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Filters */}
