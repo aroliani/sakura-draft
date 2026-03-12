@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft, Grid2X2, Grid3X3, LayoutGrid } from "lucide-react";
+import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft, Grid2X2, Grid3X3, LayoutGrid, Home } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import AppHeader from "@/components/layout/AppHeader";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
 import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
@@ -214,6 +216,23 @@ export default function ArchivePage() {
   // Close context menu on click outside
   const handlePageClick = () => setContextMenu(null);
 
+  // Find folder node for description
+  const findFolderNode = (nodes, targetPath) => {
+    for (const node of nodes) {
+      if (node.path === targetPath) return node;
+      if (node.children) {
+        const found = findFolderNode(node.children, targetPath);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const selectedFolderNode = useMemo(() => {
+    if (!selectedFolder) return null;
+    return findFolderNode(folderTree, selectedFolder);
+  }, [selectedFolder, folderTree]);
+
   const renderFolder = (folder, depth = 0) => {
     const isExpanded = expandedFolders.has(folder.path);
     const hasChildren = folder.children.length > 0;
@@ -223,32 +242,42 @@ export default function ArchivePage() {
     return (
       <div key={folder.path}>
         <div className="group flex items-center" style={{ paddingLeft: `${12 + depth * 20}px` }}>
-          <button
-            onClick={() => {
-              if (hasChildren) toggleExpand(folder.path);
-              setSelectedFolder(folder.path);
-              setShowFavorites(false);
-              setPreviewDoc(null);
-            }}
-            className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-0 ${
-              isSelected ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            {hasChildren ? (
-              isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />
-            ) : (
-              <span className="w-3.5 shrink-0" />
-            )}
-            {isExpanded && hasChildren ? (
-              <FolderOpen size={16} className="text-sakura-warning shrink-0" />
-            ) : (
-              <Folder size={16} className={`shrink-0 ${hasChildren ? "text-muted-foreground" : "text-sakura-warning"}`} />
-            )}
-            <span className="truncate">{folder.name}</span>
-            {docCount > 0 && (
-              <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">{docCount}</span>
-            )}
-          </button>
+          <TooltipProvider delayDuration={400}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => {
+                    if (hasChildren) toggleExpand(folder.path);
+                    setSelectedFolder(folder.path);
+                    setShowFavorites(false);
+                    setPreviewDoc(null);
+                  }}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-0 ${
+                    isSelected ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {hasChildren ? (
+                    isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />
+                  ) : (
+                    <span className="w-3.5 shrink-0" />
+                  )}
+                  {isExpanded && hasChildren ? (
+                    <FolderOpen size={16} className="text-sakura-warning shrink-0" />
+                  ) : (
+                    <Folder size={16} className={`shrink-0 ${hasChildren ? "text-muted-foreground" : "text-sakura-warning"}`} />
+                  )}
+                  <span className="whitespace-nowrap">{folder.name}</span>
+                  {docCount > 0 && (
+                    <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">{docCount}</span>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="max-w-[220px]">
+                <p className="font-semibold text-xs">{folder.name}</p>
+                {folder.description && <p className="text-xs text-muted-foreground mt-0.5">{folder.description}</p>}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {isAdmin && (
             <button
               onClick={(e) => {
@@ -311,53 +340,61 @@ export default function ArchivePage() {
     <div onClick={handlePageClick}>
       <AppHeader title="Arsip Dokumen" subtitle="SMP Negeri 4 Cikarang Barat" />
       <div className="flex flex-1 animate-fade-in overflow-hidden">
-        {/* Left - Folder tree */}
-        <div className="w-64 shrink-0 border-r border-border bg-card p-4 space-y-1 overflow-y-auto">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <Folder size={16} className="text-sakura-warning" /> Struktur Folder
-            </h3>
-          </div>
-          <button
-            onClick={() => { setSelectedFolder(null); setShowFavorites(false); setPreviewDoc(null); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              !selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            Semua Dokumen
-          </button>
-          <button
-            onClick={() => { setShowFavorites(true); setSelectedFolder(null); setPreviewDoc(null); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-              showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            <Star size={14} className="text-sakura-warning" /> Favorit
-          </button>
-
-          {/* Create New Folder button - after Favorit */}
-          {isAdmin && (
+        {/* Left - Folder tree (horizontally scrollable) */}
+        <ScrollArea className="w-64 shrink-0 border-r border-border bg-card">
+          <div className="p-4 space-y-1 min-w-[240px]">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+                <Folder size={16} className="text-sakura-warning" /> Struktur Folder
+              </h3>
+            </div>
             <button
-              onClick={() => {
-                setCreateFolderParent(null);
-                setNewFolderName("");
-                setNewFolderDesc("");
-                setShowCreateFolderModal(true);
-              }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-lg border border-dashed border-primary/40 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+              onClick={() => { setSelectedFolder(null); setShowFavorites(false); setPreviewDoc(null); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                !selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+              }`}
             >
-              <FolderPlus size={16} /> Buat Folder Baru
+              Semua Dokumen
             </button>
-          )}
+            <button
+              onClick={() => { setShowFavorites(true); setSelectedFolder(null); setPreviewDoc(null); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+              }`}
+            >
+              <Star size={14} className="text-sakura-warning" /> Favorit
+            </button>
 
-          {folderTree.map((folder) => renderFolder(folder))}
-        </div>
+            {/* Create New Folder button - after Favorit */}
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setCreateFolderParent(null);
+                  setNewFolderName("");
+                  setNewFolderDesc("");
+                  setShowCreateFolderModal(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-lg border border-dashed border-primary/40 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+              >
+                <FolderPlus size={16} /> Buat Folder Baru
+              </button>
+            )}
+
+            {folderTree.map((folder) => renderFolder(folder))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         {/* Center - Document list */}
         <div className={`flex-1 p-6 space-y-4 overflow-y-auto ${previewDoc ? "max-w-[50%]" : ""}`}>
+          {/* Breadcrumb navigation */}
           {breadcrumbParts && (
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 border border-border">
-              <Monitor size={14} className="shrink-0" />
+              <Home size={14} className="shrink-0" />
+              <ChevronRight size={12} className="shrink-0" />
+              <button onClick={() => { setSelectedFolder(null); setPreviewDoc(null); }} className="hover:text-primary transition-colors">
+                Arsip Dokumen
+              </button>
               <ChevronRight size={12} className="shrink-0" />
               {breadcrumbParts.map((part, i) => (
                 <span key={part.path} className="flex items-center gap-1.5">
@@ -373,6 +410,7 @@ export default function ArchivePage() {
             </div>
           )}
 
+          {/* Folder title + description */}
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -384,7 +422,10 @@ export default function ArchivePage() {
                   "Semua Dokumen Arsip"
                 )}
               </h2>
-              <p className="text-sm text-muted-foreground">{filtered.length} dokumen ditemukan</p>
+              {selectedFolderNode?.description && (
+                <p className="text-xs text-muted-foreground mt-1 italic">Deskripsi: {selectedFolderNode.description}</p>
+              )}
+              <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} dokumen ditemukan</p>
             </div>
             <div className="flex items-center gap-2">
               {/* Grid size control */}
