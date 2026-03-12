@@ -20,6 +20,7 @@ import SettingsPage from "@/pages/SettingsPage.jsx";
 import VerifyPage from "@/pages/VerifyPage.jsx";
 import ProfilePage from "@/pages/ProfilePage.jsx";
 import ChangePasswordPage from "@/pages/ChangePasswordPage.jsx";
+import HomeDashboardPage from "@/pages/HomeDashboardPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/signup" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <SignUpPage />} />
       <Route path="/verify/:id" element={<VerifyPage />} />
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route path="/home" element={<HomeDashboardPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/archive" element={<ArchivePage />} />
