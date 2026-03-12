@@ -20,6 +20,7 @@ import SettingsPage from "@/pages/SettingsPage.jsx";
 import VerifyPage from "@/pages/VerifyPage.jsx";
 import ProfilePage from "@/pages/ProfilePage.jsx";
 import ChangePasswordPage from "@/pages/ChangePasswordPage.jsx";
+import HomeDashboardPage from "@/pages/HomeDashboardPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
