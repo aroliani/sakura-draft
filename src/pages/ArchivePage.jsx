@@ -387,9 +387,14 @@ export default function ArchivePage() {
 
         {/* Center - Document list */}
         <div className={`flex-1 p-6 space-y-4 overflow-y-auto ${previewDoc ? "max-w-[50%]" : ""}`}>
+          {/* Breadcrumb navigation */}
           {breadcrumbParts && (
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 border border-border">
-              <Monitor size={14} className="shrink-0" />
+              <Home size={14} className="shrink-0" />
+              <ChevronRight size={12} className="shrink-0" />
+              <button onClick={() => { setSelectedFolder(null); setPreviewDoc(null); }} className="hover:text-primary transition-colors">
+                Arsip Dokumen
+              </button>
               <ChevronRight size={12} className="shrink-0" />
               {breadcrumbParts.map((part, i) => (
                 <span key={part.path} className="flex items-center gap-1.5">
@@ -405,6 +410,7 @@ export default function ArchivePage() {
             </div>
           )}
 
+          {/* Folder title + description */}
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -416,7 +422,10 @@ export default function ArchivePage() {
                   "Semua Dokumen Arsip"
                 )}
               </h2>
-              <p className="text-sm text-muted-foreground">{filtered.length} dokumen ditemukan</p>
+              {selectedFolderNode?.description && (
+                <p className="text-xs text-muted-foreground mt-1 italic">Deskripsi: {selectedFolderNode.description}</p>
+              )}
+              <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} dokumen ditemukan</p>
             </div>
             <div className="flex items-center gap-2">
               {/* Grid size control */}
