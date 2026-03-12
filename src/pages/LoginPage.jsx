@@ -114,6 +114,7 @@ export default function LoginPage() {
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground mt-6">SMP Negeri 4 Cikarang Barat</p>
+          <p className="text-center text-xs text-muted-foreground/60 mt-4">© 2026 SAKURA · Developed by Group 5</p>
         </div>
       </div>
     </div>
