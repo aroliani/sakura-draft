@@ -392,8 +392,9 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
             <p className="text-sm text-muted-foreground mb-4">Apakah Anda yakin semua data dokumen sudah benar? Dokumen akan masuk antrian persetujuan setelah diunggah.</p>
             <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm space-y-1 mb-4">
               <div><span className="text-muted-foreground">Nama:</span> <span className="font-medium text-foreground">{form.judul}</span></div>
-              <div><span className="text-muted-foreground">Kategori:</span> <span className="font-medium text-foreground">{form.kategori === "Lainnya" ? customKategori : form.kategori}</span></div>
-              <div><span className="text-muted-foreground">Jenis:</span> <span className="font-medium text-foreground">{form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen}</span></div>
+              <div><span className="text-muted-foreground">Kategori:</span> <span className="font-medium text-foreground">{form.kategori}</span></div>
+              <div><span className="text-muted-foreground">Jenis:</span> <span className="font-medium text-foreground">{form.jenisDokumen}</span></div>
+              <div><span className="text-muted-foreground">Nomor:</span> <span className="font-medium text-foreground">{form.nomorDokumen}</span></div>
               {file && <div><span className="text-muted-foreground">File:</span> <span className="font-medium text-foreground">{file.name}</span></div>}
             </div>
             <div className="flex gap-2 justify-end">
