@@ -53,13 +53,10 @@ export default function AppSidebar() {
           </button>
         )}
 
-        {/* Title & description */}
+        {/* Title only — no description */}
         {!collapsed && (
           <button onClick={() => navigate("/home")} className="mt-3 text-left hover:opacity-80 transition-opacity cursor-pointer w-full">
             <div className="text-sidebar-primary font-bold text-base leading-tight tracking-wide">SAKURA</div>
-            <p className="text-sidebar-foreground/55 text-[9.5px] leading-relaxed mt-1">
-              Secure Archiving and Keeping of Unified Records for Administration
-            </p>
           </button>
         )}
       </div>

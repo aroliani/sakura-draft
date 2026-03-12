@@ -95,7 +95,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.judul) return;
+    if (!form.judul || !form.nomorDokumen) return;
     setShowConfirm(true);
   };
 
@@ -103,7 +103,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
     const folderId = getFolderIdForDocument(selectedCategoryId, selectedTypeId);
 
     uploadDocument({
-      nomorDokumen: form.nomorDokumen || `DOC-${Date.now()}`,
+      nomorDokumen: form.nomorDokumen,
       judul: form.judul,
       kategori: form.kategori || "-",
       category_id: selectedCategoryId,
@@ -118,6 +118,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
       namaSiswa: metaData.namaSiswa || "",
       nisn: metaData.nisn || "",
       tahunAjaran: metaData.tahunAjaran || "",
+      nip: metaData.restrictedNip || metaData.nip || "",
       pengunggah: { id: currentUser.id, nama: currentUser.nama, role: currentUser.role, avatar: currentUser.avatar },
       tanggalUpload: form.tanggalUpload.toISOString(),
       fileUrl: filePreview || "/mock/sample.pdf",
@@ -311,8 +312,8 @@ export default function UploadForm({ onSuccess, onCancel }) {
             <h3 className="font-bold text-foreground mb-4">Data Dokumen</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen</label>
-                <input readOnly value={form.nomorDokumen} placeholder="Otomatis setelah memilih jenis dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
+                <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen *</label>
+                <input required value={form.nomorDokumen} onChange={(e) => update("nomorDokumen", e.target.value)} placeholder="Contoh: 421/SMKN4/SK/2025" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
@@ -344,10 +345,6 @@ export default function UploadForm({ onSuccess, onCancel }) {
                   setSelectedTypeId(typeId || null);
                   setMetaData({});
                   update("jenisDokumen", docType?.type_name || "");
-                  if (typeId) {
-                    const docNum = generateDocumentNumber(typeId);
-                    update("nomorDokumen", docNum);
-                  }
                 }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!selectedCategoryId}>
                   <option value="">{selectedCategoryId ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
                   {jenisOptions.map((t) => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
@@ -392,6 +389,27 @@ export default function UploadForm({ onSuccess, onCancel }) {
               </h3>
               <div className="space-y-4">
                 {dynamicFields.map((field) => renderField(field))}
+              </div>
+            </div>
+          )}
+
+          {/* Restricted access fields for sensitive docs */}
+          {hasSelection && (selectedCategoryId === 2 || selectedTypeId === 12) && (
+            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 sm:p-6 animate-fade-in">
+              <h3 className="font-bold text-foreground mb-1 flex items-center gap-2">
+                <FileIcon size={18} className="text-destructive" />
+                Akses Terbatas (Dokumen Sensitif)
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Dokumen ini hanya dapat diakses oleh Admin dan guru terkait berdasarkan NIP.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Nama Guru Terkait</label>
+                  <input value={metaData.restrictedTeacherName || ""} onChange={(e) => updateMeta("restrictedTeacherName", e.target.value)} placeholder="Nama guru pemilik dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">NIP Guru Terkait</label>
+                  <input value={metaData.restrictedNip || ""} onChange={(e) => updateMeta("restrictedNip", e.target.value)} placeholder="Nomor Induk Pegawai guru" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
               </div>
             </div>
           )}

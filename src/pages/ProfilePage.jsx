@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { User, Mail, Shield, Building2, Camera, Upload as UploadIcon, Save } from "lucide-react";
+import { User, Mail, Shield, Building2, Camera, Upload as UploadIcon, Save, Hash } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import { useApp } from "@/contexts/AppContext";
 import { useToast } from "@/hooks/use-toast";
@@ -157,7 +157,8 @@ export default function ProfilePage() {
             {[
               { icon: Mail, label: "Email", value: currentUser.email },
               { icon: Shield, label: "Role", value: currentUser.role },
-              { icon: Building2, label: "Department", value: currentUser.departemen || "-" },
+              { icon: Building2, label: "Departemen", value: currentUser.departemen || "-" },
+              { icon: Hash, label: "NIP", value: currentUser.nip || "-" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label}>
                 <label className="block text-xs text-muted-foreground mb-1.5 font-medium">{label}</label>

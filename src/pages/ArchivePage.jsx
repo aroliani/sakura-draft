@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft } from "lucide-react";
+import { Search, RotateCcw, Folder, FolderOpen, Star, FileText as FileIcon, ChevronRight, ChevronDown, Eye, Download, Clock, X, Upload, Plus, Pencil, Trash2, Monitor, MoreVertical, FolderPlus, FilePlus, ArrowRightLeft, Grid2X2, Grid3X3, LayoutGrid } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
 import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
@@ -57,8 +57,27 @@ export default function ArchivePage() {
   const [moveDestination, setMoveDestination] = useState("");
 
   const [contextMenu, setContextMenu] = useState(null); // { x, y, type, data }
+  const [folderGridSize, setFolderGridSize] = useState("medium"); // small, medium, large
 
   const isAdmin = currentUser.role === "Operator/TU";
+
+  // Filter documents based on access restriction
+  const accessibleDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      // Admin can see everything
+      if (currentUser.role === "Operator/TU") return true;
+      // Sensitive categories: Data Guru (2) and SK (type_id 12)
+      const isSensitive = doc.category_id === 2 || doc.type_id === 12;
+      if (!isSensitive) return true;
+      // Teachers can only see their own docs (matched by NIP)
+      if (currentUser.role === "Guru" && currentUser.nip) {
+        return doc.nip === currentUser.nip || doc.pengunggah?.id === currentUser.id;
+      }
+      // Kepala Sekolah can see all
+      if (currentUser.role === "Kepala Sekolah") return true;
+      return false;
+    });
+  }, [documents, currentUser]);
 
   const folderTree = useMemo(() => buildFolderTree(documents), [documents]);
 
@@ -77,7 +96,7 @@ export default function ArchivePage() {
   };
 
   const filtered = useMemo(() => {
-    let docs = documents;
+    let docs = accessibleDocuments;
     if (showFavorites) docs = docs.filter((d) => d.favorite);
     if (selectedFolder) docs = docs.filter((d) => docMatchesFolder(d, selectedFolder));
     if (statusFilter !== "Semua") docs = docs.filter((d) => d.status === statusFilter);
@@ -87,7 +106,7 @@ export default function ArchivePage() {
       docs = docs.filter((d) => d.judul.toLowerCase().includes(q) || d.nomorDokumen.toLowerCase().includes(q) || d.pengunggah.nama.toLowerCase().includes(q));
     }
     return docs;
-  }, [documents, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
+  }, [accessibleDocuments, search, statusFilter, categoryFilter, selectedFolder, showFavorites]);
 
   const groupedDocs = useMemo(() => {
     const groups = {};
@@ -367,29 +386,37 @@ export default function ArchivePage() {
               </h2>
               <p className="text-sm text-muted-foreground">{filtered.length} dokumen ditemukan</p>
             </div>
-            {/* In-folder actions for admin */}
-            {isAdmin && selectedFolder && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setCreateFolderParent(selectedFolder);
-                    setNewFolderName("");
-                    setNewFolderDesc("");
-                    setShowCreateFolderModal(true);
-                  }}
-                >
-                  <FolderPlus size={14} className="mr-1.5" /> Sub-folder
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setShowUploadModal(true)}
-                >
-                  <FilePlus size={14} className="mr-1.5" /> Upload File
-                </Button>
+            <div className="flex items-center gap-2">
+              {/* Grid size control */}
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+                <button onClick={() => setFolderGridSize("small")} title="Kecil" className={`p-1.5 rounded ${folderGridSize === "small" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid3X3 size={14} /></button>
+                <button onClick={() => setFolderGridSize("medium")} title="Sedang" className={`p-1.5 rounded ${folderGridSize === "medium" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid2X2 size={14} /></button>
+                <button onClick={() => setFolderGridSize("large")} title="Besar" className={`p-1.5 rounded ${folderGridSize === "large" ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}><LayoutGrid size={14} /></button>
               </div>
-            )}
+              {/* In-folder actions for admin */}
+              {isAdmin && selectedFolder && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCreateFolderParent(selectedFolder);
+                      setNewFolderName("");
+                      setNewFolderDesc("");
+                      setShowCreateFolderModal(true);
+                    }}
+                  >
+                    <FolderPlus size={14} className="mr-1.5" /> Sub-folder
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowUploadModal(true)}
+                  >
+                    <FilePlus size={14} className="mr-1.5" /> Upload File
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Filters */}
@@ -590,6 +617,29 @@ export default function ArchivePage() {
                 <FilePlus size={15} className="text-muted-foreground" /> Upload File
               </button>
               <div className="border-t border-border my-1" />
+              <button
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                onClick={() => {
+                  setEditTarget({ type: "folder", data: { id: contextMenu.data.folder_id || contextMenu.data.id, name: contextMenu.data.name } });
+                  setEditName(contextMenu.data.name);
+                  setEditDesc("");
+                  setShowEditModal(true);
+                  setContextMenu(null);
+                }}
+              >
+                <Pencil size={15} className="text-muted-foreground" /> Edit Folder
+              </button>
+              <button
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                onClick={() => {
+                  setMoveTarget({ id: contextMenu.data.folder_id || contextMenu.data.id, judul: contextMenu.data.name, isFolder: true });
+                  setMoveDestination("");
+                  setShowMoveModal(true);
+                  setContextMenu(null);
+                }}
+              >
+                <ArrowRightLeft size={15} className="text-muted-foreground" /> Pindahkan Folder
+              </button>
               <button
                 className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                 onClick={() => {

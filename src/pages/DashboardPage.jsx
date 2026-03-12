@@ -31,7 +31,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Dashboard" subtitle="SMP Negeri 4 Cikarang Barat" />
+      <AppHeader title="Dashboard" subtitle={`Selamat Datang, ${currentUser.nama}`} />
+      <div className="border-b border-border" />
       <div className="p-8 space-y-6 animate-fade-in">
         <div className="flex gap-1 bg-muted rounded-xl p-1 w-fit">
           {TABS.map((tab) => (
