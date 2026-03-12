@@ -12,7 +12,6 @@ import { format, differenceInHours } from "date-fns";
 
 const TABS = [
   { key: "ringkasan", label: "Ringkasan", icon: Archive },
-  { key: "dokumen", label: "Dokumen", icon: Folder },
   { key: "persetujuan", label: "Persetujuan", icon: CheckCircle },
 ];
 
