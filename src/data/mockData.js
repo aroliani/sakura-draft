@@ -41,26 +41,26 @@ export const INITIAL_DOCUMENT_COUNTERS = [];
 // Mirror of `folders` table — hierarchical: categories → document types (→ tahun_ajaran for Data Siswa)
 export const FOLDERS = [
   // Root category folders
-  { folder_id: 1, folder_name: "Data Siswa", parent_id: null, category_id: 1, type_id: null },
-  { folder_id: 2, folder_name: "Data Guru", parent_id: null, category_id: 2, type_id: null },
-  { folder_id: 3, folder_name: "Sarana Prasarana", parent_id: null, category_id: 3, type_id: null },
-  { folder_id: 4, folder_name: "Surat Menyurat", parent_id: null, category_id: 4, type_id: null },
+  { folder_id: 1, folder_name: "Data Siswa", parent_id: null, category_id: 1, type_id: null, description: "Berisi dokumen administrasi siswa seperti buku klapper, buku induk, ijazah, dan SKHU." },
+  { folder_id: 2, folder_name: "Data Guru", parent_id: null, category_id: 2, type_id: null, description: "Berisi dokumen kepegawaian guru seperti buku induk pegawai, sertifikat pendidik, dan catatan diklat." },
+  { folder_id: 3, folder_name: "Sarana Prasarana", parent_id: null, category_id: 3, type_id: null, description: "Berisi dokumen inventaris barang dan pemeliharaan sarana prasarana sekolah." },
+  { folder_id: 4, folder_name: "Surat Menyurat", parent_id: null, category_id: 4, type_id: null, description: "Berisi arsip surat masuk, surat keluar, dan surat keputusan (SK)." },
   // Data Siswa sub-folders (document types)
-  { folder_id: 10, folder_name: "Buku Klapper", parent_id: 1, category_id: 1, type_id: 1 },
-  { folder_id: 11, folder_name: "Buku Induk Register Peserta Didik", parent_id: 1, category_id: 1, type_id: 2 },
-  { folder_id: 12, folder_name: "Surat Keterangan Hasil Ujian (SKHU)", parent_id: 1, category_id: 1, type_id: 3 },
-  { folder_id: 13, folder_name: "Ijazah SMP", parent_id: 1, category_id: 1, type_id: 4 },
+  { folder_id: 10, folder_name: "Buku Klapper", parent_id: 1, category_id: 1, type_id: 1, description: "Buku klapper berisi daftar nama siswa yang disusun menurut abjad." },
+  { folder_id: 11, folder_name: "Buku Induk Register Peserta Didik", parent_id: 1, category_id: 1, type_id: 2, description: "Buku induk berisi data lengkap seluruh peserta didik." },
+  { folder_id: 12, folder_name: "Surat Keterangan Hasil Ujian (SKHU)", parent_id: 1, category_id: 1, type_id: 3, description: "Arsip SKHU siswa yang telah menyelesaikan ujian." },
+  { folder_id: 13, folder_name: "Ijazah SMP", parent_id: 1, category_id: 1, type_id: 4, description: "Arsip ijazah siswa SMP." },
   // Data Guru sub-folders
-  { folder_id: 20, folder_name: "Buku Induk Pegawai", parent_id: 2, category_id: 2, type_id: 5 },
-  { folder_id: 21, folder_name: "Sertifikat Pendidik", parent_id: 2, category_id: 2, type_id: 6 },
-  { folder_id: 22, folder_name: "Catatan Diklat", parent_id: 2, category_id: 2, type_id: 7 },
+  { folder_id: 20, folder_name: "Buku Induk Pegawai", parent_id: 2, category_id: 2, type_id: 5, description: "Data pokok seluruh pegawai sekolah." },
+  { folder_id: 21, folder_name: "Sertifikat Pendidik", parent_id: 2, category_id: 2, type_id: 6, description: "Arsip sertifikat profesional pendidik." },
+  { folder_id: 22, folder_name: "Catatan Diklat", parent_id: 2, category_id: 2, type_id: 7, description: "Catatan pelatihan dan pendidikan guru." },
   // Sarana Prasarana sub-folders
-  { folder_id: 30, folder_name: "Buku Inventaris Barang dan Penghapusan Barang", parent_id: 3, category_id: 3, type_id: 8 },
-  { folder_id: 31, folder_name: "Buku Pemeliharaan & Perbaikan", parent_id: 3, category_id: 3, type_id: 9 },
+  { folder_id: 30, folder_name: "Buku Inventaris Barang dan Penghapusan Barang", parent_id: 3, category_id: 3, type_id: 8, description: "Daftar inventaris barang milik sekolah." },
+  { folder_id: 31, folder_name: "Buku Pemeliharaan & Perbaikan", parent_id: 3, category_id: 3, type_id: 9, description: "Catatan pemeliharaan dan perbaikan sarana sekolah." },
   // Surat Menyurat sub-folders
-  { folder_id: 40, folder_name: "Buku Agenda Surat Masuk", parent_id: 4, category_id: 4, type_id: 10 },
-  { folder_id: 41, folder_name: "Buku Agenda Surat Keluar", parent_id: 4, category_id: 4, type_id: 11 },
-  { folder_id: 42, folder_name: "Kumpulan Surat Keputusan (SK)", parent_id: 4, category_id: 4, type_id: 12 },
+  { folder_id: 40, folder_name: "Buku Agenda Surat Masuk", parent_id: 4, category_id: 4, type_id: 10, description: "Arsip agenda surat masuk dari pihak luar." },
+  { folder_id: 41, folder_name: "Buku Agenda Surat Keluar", parent_id: 4, category_id: 4, type_id: 11, description: "Arsip agenda surat keluar sekolah." },
+  { folder_id: 42, folder_name: "Kumpulan Surat Keputusan (SK)", parent_id: 4, category_id: 4, type_id: 12, description: "Arsip surat keputusan resmi sekolah." },
 ];
 
 // Backward-compatible derived exports
