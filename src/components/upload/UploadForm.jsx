@@ -150,6 +150,8 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
       setFilePreview(null);
       setDetailData({});
       setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", kelas: parsedKelas, namaSiswa: "", nisn: "", tahunAjaran: parsedTahun || "2024/2025", catatan: "", tanggalUpload: new Date(), folderTujuan: targetFolder || "" });
+      setSelectedCategoryId(null);
+      setSelectedTypeId(null);
       onSuccess?.();
     }, 1000);
   };
