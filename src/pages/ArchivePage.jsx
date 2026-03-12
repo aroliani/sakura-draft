@@ -445,9 +445,6 @@ export default function ArchivePage() {
                       "Semua Dokumen Arsip"
                     )}
                   </h2>
-                  {selectedFolderNode?.description && (
-                    <p className="text-xs text-muted-foreground mt-1 italic">Deskripsi: {selectedFolderNode.description}</p>
-                  )}
                   <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} dokumen ditemukan</p>
                 </div>
                 <div className="flex items-center gap-2">
