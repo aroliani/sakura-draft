@@ -7,7 +7,7 @@ import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { KATEGORI_OPTIONS, KATEGORI_JENIS_MAP, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, buildFolderTree, flattenFolderPaths } from "@/data/mockData";
+import { CATEGORIES, DOCUMENT_TYPES, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, buildFolderTree, flattenFolderPaths } from "@/data/mockData";
 import { Calendar } from "@/components/ui/calendar";
 
 export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
