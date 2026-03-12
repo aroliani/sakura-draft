@@ -311,8 +311,8 @@ export default function UploadForm({ onSuccess, onCancel }) {
             <h3 className="font-bold text-foreground mb-4">Data Dokumen</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen</label>
-                <input readOnly value={form.nomorDokumen} placeholder="Otomatis setelah memilih jenis dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
+                <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen *</label>
+                <input required value={form.nomorDokumen} onChange={(e) => update("nomorDokumen", e.target.value)} placeholder="Contoh: 421/SMKN4/SK/2025" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
