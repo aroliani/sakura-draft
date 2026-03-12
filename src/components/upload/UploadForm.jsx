@@ -303,11 +303,16 @@ export default function UploadForm({ onSuccess, onCancel }) {
                   <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
                     {scanPageImages.map((imgSrc, i) => (
                       <div key={i} className="relative border border-border rounded-lg overflow-hidden bg-background shadow-sm">
-                        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border/50 bg-muted/20">
-                          <FileText size={11} className="text-primary" />
-                          <span className="text-xs text-muted-foreground font-medium">
-                            Halaman {i + 1} dari {scanPageImages.length}
-                          </span>
+                        <div className="flex items-center justify-between px-3 py-1.5 border-b border-border/50 bg-muted/20">
+                          <div className="flex items-center gap-2">
+                            <FileText size={11} className="text-primary" />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              Halaman {i + 1} dari {scanPageImages.length}
+                            </span>
+                          </div>
+                          <button type="button" onClick={() => rotatePage(i)} className="p-1 rounded hover:bg-muted transition-colors" title="Putar 90°">
+                            <RotateCw size={13} className="text-muted-foreground" />
+                          </button>
                         </div>
                         <div className="p-3">
                           <img
