@@ -290,7 +290,6 @@ export default function ArchivePage() {
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-[240px]">
                 <p className="font-semibold text-xs">{folder.name}</p>
-                {folder.description && <p className="text-xs text-muted-foreground mt-0.5 italic">{folder.description}</p>}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
