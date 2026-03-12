@@ -6,7 +6,6 @@ import ActivityChart from "@/components/dashboard/ActivityChart";
 import DocumentListModal from "@/components/modals/DocumentListModal";
 import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
 import { useApp } from "@/contexts/AppContext";
-import { format } from "date-fns";
 import { format, differenceInHours } from "date-fns";
 
 const TABS = [
