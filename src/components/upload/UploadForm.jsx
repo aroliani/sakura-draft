@@ -360,6 +360,12 @@ export default function UploadForm({ onSuccess, onCancel }) {
                       <div className="w-px h-6 bg-border mx-1" />
                     </>
                   )}
+                  {scanPageImages.length > 0 && (
+                    <>
+                      <button type="button" onClick={() => rotatePage(fullPreviewPage)} className="p-2 rounded hover:bg-muted" title="Putar 90°"><RotateCw size={18} /></button>
+                      <div className="w-px h-6 bg-border mx-1" />
+                    </>
+                  )}
                   <button type="button" onClick={() => setFullPreviewZoom((z) => Math.max(25, z - 25))} className="p-2 rounded hover:bg-muted"><ZoomOut size={18} /></button>
                   <span className="text-sm text-muted-foreground w-12 text-center">{fullPreviewZoom}%</span>
                   <button type="button" onClick={() => setFullPreviewZoom((z) => Math.min(300, z + 25))} className="p-2 rounded hover:bg-muted"><ZoomIn size={18} /></button>
