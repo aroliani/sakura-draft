@@ -118,6 +118,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
       namaSiswa: metaData.namaSiswa || "",
       nisn: metaData.nisn || "",
       tahunAjaran: metaData.tahunAjaran || "",
+      nip: metaData.restrictedNip || metaData.nip || "",
       pengunggah: { id: currentUser.id, nama: currentUser.nama, role: currentUser.role, avatar: currentUser.avatar },
       tanggalUpload: form.tanggalUpload.toISOString(),
       fileUrl: filePreview || "/mock/sample.pdf",
