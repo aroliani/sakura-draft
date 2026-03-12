@@ -7,11 +7,11 @@ import PdfPreviewOverlay from "@/components/modals/PdfPreviewOverlay";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { KATEGORI_OPTIONS, KATEGORI_JENIS_MAP, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, buildFolderTree, flattenFolderPaths } from "@/data/mockData";
+import { CATEGORIES, DOCUMENT_TYPES, KATEGORI_DETAIL_FIELDS, TAHUN_AJARAN_OPTIONS, buildFolderTree, flattenFolderPaths } from "@/data/mockData";
 import { Calendar } from "@/components/ui/calendar";
 
 export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
-  const { uploadDocument, currentUser, documents } = useApp();
+  const { uploadDocument, currentUser, documents, generateDocumentNumber, getFolderForCategory } = useApp();
   const { settings } = useSettings();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -26,9 +26,10 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [fullPreviewZoom, setFullPreviewZoom] = useState(100);
   const [showDetailFields, setShowDetailFields] = useState(false);
-  const [customJenis, setCustomJenis] = useState("");
-  const [customKategori, setCustomKategori] = useState("");
   const [customTahun, setCustomTahun] = useState("");
+  const [detailData, setDetailData] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedTypeId, setSelectedTypeId] = useState(null);
   const [detailData, setDetailData] = useState({});
 
   const parsedTahun = targetFolder?.split("/")[0] || "";
@@ -49,9 +50,9 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   });
 
   const jenisOptions = useMemo(() => {
-    if (!form.kategori) return [];
-    return KATEGORI_JENIS_MAP[form.kategori] || [];
-  }, [form.kategori]);
+    if (!selectedCategoryId) return [];
+    return DOCUMENT_TYPES.filter((t) => t.category_id === selectedCategoryId);
+  }, [selectedCategoryId]);
 
   const detailFields = useMemo(() => {
     return KATEGORI_DETAIL_FIELDS[form.kategori] || [];
@@ -109,16 +110,18 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
   };
 
   const confirmUpload = () => {
-    const jenis = form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen;
     const tahun = form.tahunAjaran === "Lainnya" ? customTahun : form.tahunAjaran;
-    const kategori = form.kategori === "Lainnya" ? customKategori : form.kategori;
+    const folder = getFolderForCategory(selectedCategoryId);
 
     uploadDocument({
       nomorDokumen: form.nomorDokumen || `DOC-${Date.now()}`,
       judul: form.judul,
-      kategori: kategori || "Lainnya",
+      kategori: form.kategori || "-",
+      category_id: selectedCategoryId,
+      type_id: selectedTypeId,
+      folder_id: folder?.folder_id || null,
       kelas: form.kelas || "-",
-      jenisDokumen: jenis,
+      jenisDokumen: form.jenisDokumen,
       namaSiswa: form.namaSiswa,
       nisn: form.nisn,
       tahunAjaran: tahun,
@@ -147,6 +150,8 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
       setFilePreview(null);
       setDetailData({});
       setForm({ nomorDokumen: "", judul: "", jenisDokumen: "", kategori: "", kelas: parsedKelas, namaSiswa: "", nisn: "", tahunAjaran: parsedTahun || "2024/2025", catatan: "", tanggalUpload: new Date(), folderTujuan: targetFolder || "" });
+      setSelectedCategoryId(null);
+      setSelectedTypeId(null);
       onSuccess?.();
     }, 1000);
   };
@@ -251,7 +256,7 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Nomor Dokumen</label>
-              <input value={form.nomorDokumen} onChange={(e) => update("nomorDokumen", e.target.value)} placeholder="Contoh: IJZ/2024/001" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+              <input readOnly value={form.nomorDokumen} placeholder="Otomatis setelah memilih jenis dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-muted/50 text-sm text-muted-foreground cursor-not-allowed" />
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Nama Dokumen *</label>
@@ -260,25 +265,41 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Kategori Dokumen *</label>
-              <select required value={form.kategori} onChange={(e) => { update("kategori", e.target.value); update("jenisDokumen", ""); setCustomKategori(""); }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+              <select required value={selectedCategoryId || ""} onChange={(e) => {
+                const catId = Number(e.target.value);
+                const cat = CATEGORIES.find((c) => c.category_id === catId);
+                setSelectedCategoryId(catId || null);
+                setSelectedTypeId(null);
+                update("kategori", cat?.category_name || "");
+                update("jenisDokumen", "");
+                update("nomorDokumen", "");
+                // Auto-set folder
+                if (cat) {
+                  const folder = getFolderForCategory(catId);
+                  if (folder) update("folderTujuan", folder.folder_name);
+                }
+              }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="">Pilih kategori</option>
-                {KATEGORI_OPTIONS.map((k) => <option key={k}>{k}</option>)}
+                {CATEGORIES.map((c) => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
               </select>
-              {form.kategori === "Lainnya" && (
-                <input value={customKategori} onChange={(e) => setCustomKategori(e.target.value)} placeholder="Ketik nama kategori..." className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Jenis Dokumen *</label>
-              <select required value={form.jenisDokumen} onChange={(e) => update("jenisDokumen", e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!form.kategori}>
-                <option value="">{form.kategori ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
-                {jenisOptions.map((j) => <option key={j}>{j}</option>)}
-                <option value="Lainnya">Lainnya</option>
+              <select required value={selectedTypeId || ""} onChange={(e) => {
+                const typeId = Number(e.target.value);
+                const docType = DOCUMENT_TYPES.find((t) => t.type_id === typeId);
+                setSelectedTypeId(typeId || null);
+                update("jenisDokumen", docType?.type_name || "");
+                // Auto-generate document number
+                if (typeId) {
+                  const docNum = generateDocumentNumber(typeId);
+                  update("nomorDokumen", docNum);
+                }
+              }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!selectedCategoryId}>
+                <option value="">{selectedCategoryId ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
+                {jenisOptions.map((t) => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
               </select>
-              {form.jenisDokumen === "Lainnya" && (
-                <input value={customJenis} onChange={(e) => setCustomJenis(e.target.value)} placeholder="Ketik jenis dokumen..." className="w-full mt-2 px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-              )}
             </div>
 
             <div>
@@ -371,8 +392,9 @@ export default function UploadForm({ targetFolder, onSuccess, onCancel }) {
             <p className="text-sm text-muted-foreground mb-4">Apakah Anda yakin semua data dokumen sudah benar? Dokumen akan masuk antrian persetujuan setelah diunggah.</p>
             <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm space-y-1 mb-4">
               <div><span className="text-muted-foreground">Nama:</span> <span className="font-medium text-foreground">{form.judul}</span></div>
-              <div><span className="text-muted-foreground">Kategori:</span> <span className="font-medium text-foreground">{form.kategori === "Lainnya" ? customKategori : form.kategori}</span></div>
-              <div><span className="text-muted-foreground">Jenis:</span> <span className="font-medium text-foreground">{form.jenisDokumen === "Lainnya" ? customJenis : form.jenisDokumen}</span></div>
+              <div><span className="text-muted-foreground">Kategori:</span> <span className="font-medium text-foreground">{form.kategori}</span></div>
+              <div><span className="text-muted-foreground">Jenis:</span> <span className="font-medium text-foreground">{form.jenisDokumen}</span></div>
+              <div><span className="text-muted-foreground">Nomor:</span> <span className="font-medium text-foreground">{form.nomorDokumen}</span></div>
               {file && <div><span className="text-muted-foreground">File:</span> <span className="font-medium text-foreground">{file.name}</span></div>}
             </div>
             <div className="flex gap-2 justify-end">

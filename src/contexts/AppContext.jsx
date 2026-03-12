@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import { USERS, DOCUMENTS, ROLE_PERMISSIONS, INITIAL_NOTIFICATIONS } from "@/data/mockData.js";
+import React, { createContext, useContext, useState, useRef } from "react";
+import { USERS, DOCUMENTS, ROLE_PERMISSIONS, INITIAL_NOTIFICATIONS, DOCUMENT_TYPES, CATEGORIES, FOLDERS, INITIAL_DOCUMENT_COUNTERS } from "@/data/mockData.js";
 
 const AppContext = createContext(null);
 
@@ -15,7 +15,37 @@ export const AppProvider = ({ children }) => {
   const [documents, setDocuments] = useState(DOCUMENTS);
   const [rolePermissions, setRolePermissions] = useState(ROLE_PERMISSIONS);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [documentCounters, setDocumentCounters] = useState(INITIAL_DOCUMENT_COUNTERS);
+  const countersRef = useRef(documentCounters);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const generateDocumentNumber = (typeId) => {
+    const docType = DOCUMENT_TYPES.find((t) => t.type_id === typeId);
+    if (!docType) return `DOC-${Date.now()}`;
+    const prefix = docType.code_prefix;
+    const year = new Date().getFullYear();
+    const counters = countersRef.current;
+    const existing = counters.find((c) => c.prefix === prefix && c.year === year);
+    let nextSeq;
+    let updated;
+    if (existing) {
+      nextSeq = existing.last_seq + 1;
+      updated = counters.map((c) => (c.prefix === prefix && c.year === year ? { ...c, last_seq: nextSeq } : c));
+    } else {
+      nextSeq = 1;
+      updated = [...counters, { prefix, year, last_seq: 1 }];
+    }
+    countersRef.current = updated;
+    setDocumentCounters(updated);
+    return `${prefix}/${year}/${String(nextSeq).padStart(3, "0")}`;
+  };
+
+  const getFolderForCategory = (categoryId) => {
+    const cat = CATEGORIES.find((c) => c.category_id === categoryId);
+    if (!cat) return null;
+    const folder = FOLDERS.find((f) => f.folder_name === cat.category_name);
+    return folder || null;
+  };
 
   const login = (email) => {
     const user = users.find((u) => u.email === email);
@@ -156,7 +186,7 @@ export const AppProvider = ({ children }) => {
       login, logout, updateUserRole, updateUserAvatar, togglePermission, addAuditNote,
       hasPermission, approveDocument, rejectDocument, uploadDocument, archiveDocument,
       toggleFavorite, markNotificationRead, markAllNotificationsRead,
-      addUser, updateUser, deleteUser,
+      addUser, updateUser, deleteUser, generateDocumentNumber, getFolderForCategory,
     }}>
       {children}
     </AppContext.Provider>
