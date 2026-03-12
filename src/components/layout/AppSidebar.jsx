@@ -33,14 +33,18 @@ export default function AppSidebar() {
           >
             {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
           </button>
-          {!collapsed && (
-            <button
-              onClick={() => navigate("/home")}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer min-w-0"
-            >
-              <img src={logoSakura} alt="SAKURA" className="w-9 h-9 rounded-full bg-sidebar-accent shrink-0" />
-            </button>
-          )}
+          <button
+            onClick={() => navigate("/home")}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer min-w-0"
+          >
+            <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-full bg-sidebar-accent shrink-0" />
+            {!collapsed && (
+              <div className="text-left min-w-0">
+                <div className="text-sidebar-primary font-bold text-sm leading-tight tracking-wide">SAKURA</div>
+                <div className="text-sidebar-foreground/50 text-[9px] leading-snug">Secure Archive System</div>
+              </div>
+            )}
+          </button>
         </div>
 
         {/* Logo centered when collapsed */}
@@ -49,15 +53,7 @@ export default function AppSidebar() {
             onClick={() => navigate("/home")}
             className="mt-2 flex justify-center hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <img src={logoSakura} alt="SAKURA" className="w-9 h-9 rounded-full bg-sidebar-accent" />
-          </button>
-        )}
-
-        {/* Title only */}
-        {!collapsed && (
-          <button onClick={() => navigate("/home")} className="mt-2 text-left hover:opacity-80 transition-opacity cursor-pointer w-full">
-            <div className="text-sidebar-primary font-bold text-base leading-tight tracking-wide">SAKURA</div>
-            <div className="text-sidebar-foreground/50 text-[9px] leading-snug mt-0.5">Secure Archive System</div>
+            <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-full bg-sidebar-accent" />
           </button>
         )}
       </div>
