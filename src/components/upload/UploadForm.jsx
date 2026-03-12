@@ -392,6 +392,27 @@ export default function UploadForm({ onSuccess, onCancel }) {
             </div>
           )}
 
+          {/* Restricted access fields for sensitive docs */}
+          {hasSelection && (selectedCategoryId === 2 || selectedTypeId === 12) && (
+            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 sm:p-6 animate-fade-in">
+              <h3 className="font-bold text-foreground mb-1 flex items-center gap-2">
+                <FileIcon size={18} className="text-destructive" />
+                Akses Terbatas (Dokumen Sensitif)
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Dokumen ini hanya dapat diakses oleh Admin dan guru terkait berdasarkan NIP.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Nama Guru Terkait</label>
+                  <input value={metaData.restrictedTeacherName || ""} onChange={(e) => updateMeta("restrictedTeacherName", e.target.value)} placeholder="Nama guru pemilik dokumen" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">NIP Guru Terkait</label>
+                  <input value={metaData.restrictedNip || ""} onChange={(e) => updateMeta("restrictedNip", e.target.value)} placeholder="Nomor Induk Pegawai guru" className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Submit button */}
           <div className="flex gap-3">
             {onCancel && (
