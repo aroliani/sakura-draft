@@ -18,6 +18,7 @@ import UserManagementPage from "@/pages/UserManagementPage.jsx";
 import LogPage from "@/pages/LogPage.jsx";
 import SettingsPage from "@/pages/SettingsPage.jsx";
 import VerifyPage from "@/pages/VerifyPage.jsx";
+import ProfilePage from "@/pages/ProfilePage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -44,6 +45,8 @@ function AppRoutes() {
         <Route path="/users" element={<UserManagementPage />} />
         <Route path="/roles" element={<RoleManagementPage />} />
         <Route path="/logs" element={<LogPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
