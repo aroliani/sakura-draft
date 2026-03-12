@@ -340,47 +340,50 @@ export default function ArchivePage() {
     <div onClick={handlePageClick}>
       <AppHeader title="Arsip Dokumen" subtitle="SMP Negeri 4 Cikarang Barat" />
       <div className="flex flex-1 animate-fade-in overflow-hidden">
-        {/* Left - Folder tree */}
-        <div className="w-64 shrink-0 border-r border-border bg-card p-4 space-y-1 overflow-y-auto">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <Folder size={16} className="text-sakura-warning" /> Struktur Folder
-            </h3>
-          </div>
-          <button
-            onClick={() => { setSelectedFolder(null); setShowFavorites(false); setPreviewDoc(null); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              !selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            Semua Dokumen
-          </button>
-          <button
-            onClick={() => { setShowFavorites(true); setSelectedFolder(null); setPreviewDoc(null); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-              showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            <Star size={14} className="text-sakura-warning" /> Favorit
-          </button>
-
-          {/* Create New Folder button - after Favorit */}
-          {isAdmin && (
+        {/* Left - Folder tree (horizontally scrollable) */}
+        <ScrollArea className="w-64 shrink-0 border-r border-border bg-card">
+          <div className="p-4 space-y-1 min-w-[240px]">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+                <Folder size={16} className="text-sakura-warning" /> Struktur Folder
+              </h3>
+            </div>
             <button
-              onClick={() => {
-                setCreateFolderParent(null);
-                setNewFolderName("");
-                setNewFolderDesc("");
-                setShowCreateFolderModal(true);
-              }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-lg border border-dashed border-primary/40 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+              onClick={() => { setSelectedFolder(null); setShowFavorites(false); setPreviewDoc(null); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                !selectedFolder && !showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+              }`}
             >
-              <FolderPlus size={16} /> Buat Folder Baru
+              Semua Dokumen
             </button>
-          )}
+            <button
+              onClick={() => { setShowFavorites(true); setSelectedFolder(null); setPreviewDoc(null); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                showFavorites ? "bg-secondary text-primary" : "text-foreground hover:bg-muted"
+              }`}
+            >
+              <Star size={14} className="text-sakura-warning" /> Favorit
+            </button>
 
-          {folderTree.map((folder) => renderFolder(folder))}
-        </div>
+            {/* Create New Folder button - after Favorit */}
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setCreateFolderParent(null);
+                  setNewFolderName("");
+                  setNewFolderDesc("");
+                  setShowCreateFolderModal(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-lg border border-dashed border-primary/40 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+              >
+                <FolderPlus size={16} /> Buat Folder Baru
+              </button>
+            )}
+
+            {folderTree.map((folder) => renderFolder(folder))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         {/* Center - Document list */}
         <div className={`flex-1 p-6 space-y-4 overflow-y-auto ${previewDoc ? "max-w-[50%]" : ""}`}>
