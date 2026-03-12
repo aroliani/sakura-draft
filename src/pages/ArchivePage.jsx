@@ -37,7 +37,6 @@ export default function ArchivePage() {
   const [expandedFolders, setExpandedFolders] = useState(new Set());
   const [showFavorites, setShowFavorites] = useState(false);
   const [previewDoc, setPreviewDoc] = useState(null);
-  const [showPdfOverlay, setShowPdfOverlay] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   // CRUD modal states
