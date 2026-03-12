@@ -12,7 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 
 export default function UploadForm({ onSuccess, onCancel }) {
   const { uploadDocument, currentUser, generateDocumentNumber } = useApp();
-  const { settings } = useSettings();
+  
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileRef = useRef(null);
