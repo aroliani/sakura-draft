@@ -125,18 +125,45 @@ export const ROLE_PERMISSIONS = {
   "Guru": ["dashboard.view", "documents.archive", "profile.edit"],
 };
 
-export const KATEGORI_OPTIONS = [
-  "Data Siswa", "Data Guru", "Sarana Prasarana Sekolah", "Surat Menyurat", "Keuangan", "Lainnya",
+// ===== Schema-aligned tables (mirrors MySQL) =====
+
+// Mirror of `categories` table
+export const CATEGORIES = [
+  { category_id: 1, category_name: "Data Siswa" },
+  { category_id: 2, category_name: "Data Guru" },
+  { category_id: 3, category_name: "Sarana Prasarana" },
+  { category_id: 4, category_name: "Surat Menyurat" },
 ];
 
-export const KATEGORI_JENIS_MAP = {
-  "Data Siswa": ["Surat Masuk dan Keluar Siswa", "Surat Pindah Siswa", "Ijazah SMP", "Surat Keterangan Hasil Ujian (SKHU)", "Rekapitulasi Absensi Siswa dan Guru", "Sertifikat Prestasi Siswa"],
-  "Data Guru": ["Sertifikat Guru", "Surat Keputusan (Arsip Surat)", "Rekapitulasi Absensi Siswa dan Guru"],
-  "Sarana Prasarana Sekolah": ["Inventaris Sarana Prasarana"],
-  "Surat Menyurat": ["Surat Masuk dan Keluar Siswa", "Surat Pindah Siswa", "Surat Keputusan (Arsip Surat)"],
-  "Keuangan": ["Laporan Keuangan"],
-  "Lainnya": ["Sertifikat Prestasi Siswa", "Lainnya"],
-};
+// Mirror of `document_types` table
+export const DOCUMENT_TYPES = [
+  { type_id: 1, category_id: 1, type_name: "Buku Klapper", code_prefix: "BKL" },
+  { type_id: 2, category_id: 1, type_name: "Buku Induk Register Peserta Didik", code_prefix: "BIR" },
+  { type_id: 3, category_id: 1, type_name: "Surat Keterangan Hasil Ujian (SKHU)", code_prefix: "SKH" },
+  { type_id: 4, category_id: 1, type_name: "Ijazah SMP", code_prefix: "IJZ" },
+  { type_id: 5, category_id: 2, type_name: "Buku Induk Pegawai", code_prefix: "BIP" },
+  { type_id: 6, category_id: 2, type_name: "Sertifikat Pendidik", code_prefix: "SRP" },
+  { type_id: 7, category_id: 2, type_name: "Catatan Diklat", code_prefix: "CDK" },
+  { type_id: 8, category_id: 3, type_name: "Buku Inventaris Barang dan Penghapusan Barang", code_prefix: "BIB" },
+  { type_id: 9, category_id: 3, type_name: "Buku Pemeliharaan & Perbaikan", code_prefix: "BPP" },
+  { type_id: 10, category_id: 4, type_name: "Buku Agenda Surat Masuk", code_prefix: "ASM" },
+  { type_id: 11, category_id: 4, type_name: "Buku Agenda Surat Keluar", code_prefix: "ASK" },
+  { type_id: 12, category_id: 4, type_name: "Kumpulan Surat Keputusan (SK)", code_prefix: "KSK" },
+];
+
+// Mirror of `document_counters` table (mutable state managed in AppContext)
+export const INITIAL_DOCUMENT_COUNTERS = [];
+
+// Mirror of `folders` table
+export const FOLDERS = [
+  { folder_id: 1, folder_name: "Data Siswa", parent_id: null },
+  { folder_id: 2, folder_name: "Data Guru", parent_id: null },
+  { folder_id: 3, folder_name: "Sarana Prasarana", parent_id: null },
+  { folder_id: 4, folder_name: "Surat Menyurat", parent_id: null },
+];
+
+// Backward-compatible derived exports
+export const KATEGORI_OPTIONS = CATEGORIES.map((c) => c.category_name);
 
 export const KATEGORI_DETAIL_FIELDS = {
   "Data Siswa": [
@@ -151,7 +178,7 @@ export const KATEGORI_DETAIL_FIELDS = {
     { key: "bidangStudi", label: "Bidang Studi", placeholder: "Contoh: Matematika" },
     { key: "jabatan", label: "Jabatan", placeholder: "Contoh: Guru Tetap" },
   ],
-  "Sarana Prasarana Sekolah": [
+  "Sarana Prasarana": [
     { key: "kodeBarang", label: "Kode Barang", placeholder: "Contoh: INV-001" },
     { key: "lokasi", label: "Lokasi", placeholder: "Contoh: Ruang Lab IPA" },
     { key: "kondisi", label: "Kondisi", placeholder: "Baik / Rusak Ringan / Rusak Berat" },
