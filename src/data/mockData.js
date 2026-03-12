@@ -4,9 +4,9 @@ import avatarStaff from "@/assets/avatar_staff.jpg";
 import avatarTeacher from "@/assets/avatar_teacher.jpg";
 
 export const USERS = [
-  { id: 1, nama: "Budi Santoso", email: "admin@sakura.sch.id", role: "Operator/TU", avatar: avatarAdmin, departemen: "Operator / TU" },
-  { id: 2, nama: "Dr. Siti Rahayu", email: "principal@sakura.sch.id", role: "Kepala Sekolah", avatar: avatarPrincipal, departemen: "Kepala Sekolah" },
-  { id: 3, nama: "Ahmad Fauzi", email: "teacher@sakura.sch.id", role: "Guru", avatar: avatarTeacher, departemen: "Guru Mata Pelajaran" },
+  { id: 1, nama: "Budi Santoso", email: "admin@sakura.sch.id", role: "Operator/TU", avatar: avatarAdmin, departemen: "Operator / TU", nip: "" },
+  { id: 2, nama: "Dr. Siti Rahayu", email: "principal@sakura.sch.id", role: "Kepala Sekolah", avatar: avatarPrincipal, departemen: "Kepala Sekolah", nip: "" },
+  { id: 3, nama: "Ahmad Fauzi", email: "teacher@sakura.sch.id", role: "Guru", avatar: avatarTeacher, departemen: "Guru Mata Pelajaran", nip: "198723450001" },
 ];
 
 // ===== Schema-aligned tables (mirrors MySQL) =====

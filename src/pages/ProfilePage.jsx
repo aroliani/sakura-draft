@@ -157,7 +157,8 @@ export default function ProfilePage() {
             {[
               { icon: Mail, label: "Email", value: currentUser.email },
               { icon: Shield, label: "Role", value: currentUser.role },
-              { icon: Building2, label: "Department", value: currentUser.departemen || "-" },
+              { icon: Building2, label: "Departemen", value: currentUser.departemen || "-" },
+              { icon: Hash, label: "NIP", value: currentUser.nip || "-" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label}>
                 <label className="block text-xs text-muted-foreground mb-1.5 font-medium">{label}</label>

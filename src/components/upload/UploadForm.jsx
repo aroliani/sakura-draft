@@ -344,10 +344,6 @@ export default function UploadForm({ onSuccess, onCancel }) {
                   setSelectedTypeId(typeId || null);
                   setMetaData({});
                   update("jenisDokumen", docType?.type_name || "");
-                  if (typeId) {
-                    const docNum = generateDocumentNumber(typeId);
-                    update("nomorDokumen", docNum);
-                  }
                 }} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={!selectedCategoryId}>
                   <option value="">{selectedCategoryId ? "Pilih jenis dokumen" : "Pilih kategori dulu"}</option>
                   {jenisOptions.map((t) => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
