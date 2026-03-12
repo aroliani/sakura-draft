@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from "react";
-import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown, Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { Upload, Camera, X, Eye, FileText, CalendarIcon, ChevronDown, Maximize, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
 import CameraScanModal from "@/components/scan/CameraScanModal";
 import { useApp } from "@/contexts/AppContext";
 
