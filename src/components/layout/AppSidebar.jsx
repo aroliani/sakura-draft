@@ -22,7 +22,7 @@ export default function AppSidebar() {
   const visibleItems = NAV_ITEMS.filter((item) => hasPermission(item.permission));
 
   return (
-    <aside className={`${collapsed ? "w-[72px]" : "w-[270px]"} min-h-screen bg-sidebar flex flex-col shrink-0 transition-all duration-300`}>
+    <aside className={`${collapsed ? "w-[72px]" : "w-[200px]"} min-h-screen bg-sidebar flex flex-col shrink-0 transition-all duration-300`}>
       {/* Logo */}
       <div className={`flex items-center ${collapsed ? "flex-col gap-2 px-2" : "gap-3 px-5"} py-5`}>
         <img src={logoSakura} alt="SAKURA" className="w-11 h-11 rounded-full bg-sidebar-accent shrink-0" />
@@ -42,7 +42,7 @@ export default function AppSidebar() {
         </button>
       </div>
 
-      {/* Main nav */}
+      {/* Main nav — stacked: icon on top, label below */}
       <nav className="flex-1 px-3 space-y-1 mt-1">
         {visibleItems.map((item) => {
           const active = location.pathname === item.path;
@@ -51,14 +51,14 @@ export default function AppSidebar() {
               key={item.path}
               onClick={() => navigate(item.path)}
               title={collapsed ? item.label : undefined}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-[15px] font-medium transition-colors ${
+              className={`w-full flex flex-col items-center gap-1 px-2 py-3 rounded-lg font-medium transition-colors ${
                 active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
               }`}
             >
-              <item.icon size={22} className="shrink-0" />
-              {!collapsed && item.label}
+              <item.icon size={28} className="shrink-0" />
+              {!collapsed && <span className="text-[11px] leading-tight text-center">{item.label}</span>}
             </button>
           );
         })}
@@ -70,18 +70,17 @@ export default function AppSidebar() {
         <button
           onClick={() => navigate("/settings")}
           title={collapsed ? "Pengaturan Sistem" : undefined}
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-[15px] font-medium transition-colors ${
+          className={`w-full flex flex-col items-center gap-1 px-2 py-3 rounded-lg font-medium transition-colors ${
             location.pathname === "/settings"
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
               : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
           }`}
         >
-          <Settings size={22} className="shrink-0" />
-          {!collapsed && "Pengaturan Sistem"}
+          <Settings size={28} className="shrink-0" />
+          {!collapsed && <span className="text-[11px] leading-tight text-center">Pengaturan Sistem</span>}
         </button>
       </nav>
 
-      {/* Spacer to push nothing to bottom — keep sidebar balanced */}
       <div className="flex-shrink-0 h-6" />
     </aside>
   );
