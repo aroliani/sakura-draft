@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { FileText, Clock, CheckCircle, Archive, XCircle, Folder, FolderOpen, Star, ChevronRight, ChevronDown, Eye, Search, Download, X, AlertTriangle } from "lucide-react";
+import { FileText, Clock, CheckCircle, Archive, XCircle, Eye, AlertTriangle } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import ActivityChart from "@/components/dashboard/ActivityChart";
