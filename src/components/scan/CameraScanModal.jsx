@@ -164,22 +164,24 @@ export default function CameraScanModal({ onClose, onComplete }) {
               {currentImage && (
                 <div className="relative">
                   {isCropping ? (
+                  <div className="relative">
                     <div className="relative">
                       <img src={pages[currentPage].imageData} alt="" className="w-full rounded-lg opacity-50" />
                       <div className="absolute border-2 border-primary bg-primary/10 rounded" style={{ left: `${cropArea.x}%`, top: `${cropArea.y}%`, width: `${cropArea.w}%`, height: `${cropArea.h}%` }} />
-                      <div className="mt-3 grid grid-cols-4 gap-2">
-                        {["x", "y", "w", "h"].map((key) => (
-                          <div key={key}>
-                            <label className="text-xs text-muted-foreground uppercase">{key}</label>
-                            <input type="range" min={0} max={100} value={cropArea[key]} onChange={(e) => setCropArea((p) => ({ ...p, [key]: Number(e.target.value) }))} className="w-full" />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex gap-2 mt-3">
-                        <button onClick={handleCrop} className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Terapkan Crop</button>
-                        <button onClick={() => setIsCropping(false)} className="px-4 py-2 rounded-lg border border-input text-sm">Batal</button>
-                      </div>
                     </div>
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {["x", "y", "w", "h"].map((key) => (
+                        <div key={key} className="space-y-1">
+                          <label className="text-xs font-medium text-muted-foreground uppercase">{key}</label>
+                          <input type="range" min={0} max={100} value={cropArea[key]} onChange={(e) => setCropArea((p) => ({ ...p, [key]: Number(e.target.value) }))} className="w-full accent-primary" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={handleCrop} className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Terapkan Crop</button>
+                      <button onClick={() => setIsCropping(false)} className="px-4 py-2 rounded-lg border border-input text-sm">Batal</button>
+                    </div>
+                  </div>
                   ) : (
                     <img src={currentImage} alt="" className="w-full rounded-lg" />
                   )}
