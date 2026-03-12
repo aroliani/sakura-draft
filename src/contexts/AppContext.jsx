@@ -40,12 +40,7 @@ export const AppProvider = ({ children }) => {
     return `${prefix}/${year}/${String(nextSeq).padStart(3, "0")}`;
   };
 
-  const getFolderForCategory = (categoryId) => {
-    const cat = CATEGORIES.find((c) => c.category_id === categoryId);
-    if (!cat) return null;
-    const folder = FOLDERS.find((f) => f.folder_name === cat.category_name);
-    return folder || null;
-  };
+  // getFolderForCategory removed — folder mapping now handled by getFolderIdForDocument in mockData
 
   const login = (email) => {
     const user = users.find((u) => u.email === email);
