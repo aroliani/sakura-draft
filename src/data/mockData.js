@@ -380,7 +380,8 @@ export function buildFolderTree(documents) {
 }
 
 // Match document to folder path using schema-aligned path format
-export function docMatchesFolder(doc, folderPath) {
+// If strict=true, only match docs at the exact leaf level (not parent folders that have children)
+export function docMatchesFolder(doc, folderPath, strict = false) {
   // Parse the structured path: cat:X, cat:X/type:Y, cat:X/type:Y/year:Z
   const parts = folderPath.split("/");
   const catPart = parts.find((p) => p.startsWith("cat:"));
@@ -401,6 +402,13 @@ export function docMatchesFolder(doc, folderPath) {
   if (catId && typeId && !year) return doc.category_id === catId && doc.type_id === typeId;
   // If all three, exact match
   return true;
+}
+
+// Strict matching: only show docs at leaf folder level
+// For Data Siswa (cat 1) with type selected but no year: don't show docs (they belong in year sub-folders)
+export function docMatchesFolderStrict(doc, folderPath, folderHasChildren) {
+  if (folderHasChildren) return false; // docs only in leaf folders
+  return docMatchesFolder(doc, folderPath);
 }
 
 // Helper: get auto-mapped folder path for upload
