@@ -325,7 +325,7 @@ export default function UploadForm({ onSuccess, onCancel }) {
             </div>
           )}
 
-          {showFullPreview && filePreview && (
+          {showFullPreview && (filePreview || scanPageImages.length > 0) && (
             <div className="fixed inset-0 z-[100] bg-foreground/90 flex flex-col animate-fade-in">
               <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
                 <span className="font-semibold text-sm text-foreground truncate max-w-md">{file?.name}</span>
@@ -338,8 +338,28 @@ export default function UploadForm({ onSuccess, onCancel }) {
                   <button type="button" onClick={() => { setShowFullPreview(false); setFullPreviewZoom(100); }} className="p-2 rounded hover:bg-destructive/10 text-destructive"><X size={20} /></button>
                 </div>
               </div>
-              <div className="flex-1 overflow-auto flex items-center justify-center p-8" onClick={() => { setShowFullPreview(false); setFullPreviewZoom(100); }}>
-                <img src={filePreview} alt="Full preview" className="rounded-lg shadow-2xl transition-transform" style={{ transform: `scale(${fullPreviewZoom / 100})`, maxWidth: "90vw", maxHeight: "85vh", objectFit: "contain" }} onClick={(e) => e.stopPropagation()} />
+              <div className="flex-1 overflow-auto p-8" onClick={() => { setShowFullPreview(false); setFullPreviewZoom(100); }}>
+                {scanPageImages.length > 0 ? (
+                  <div className="flex flex-col items-center gap-6" onClick={(e) => e.stopPropagation()}>
+                    {scanPageImages.map((imgSrc, i) => (
+                      <div key={i} className="bg-background rounded-lg shadow-2xl overflow-hidden border border-border" style={{ transform: `scale(${fullPreviewZoom / 100})`, transformOrigin: "top center" }}>
+                        {file?.name?.endsWith(".pdf") && (
+                          <div className="flex items-center gap-2 px-4 py-2 border-b border-border/50 bg-muted/20">
+                            <FileText size={12} className="text-primary" />
+                            <span className="text-xs text-muted-foreground font-medium">Halaman {i + 1} dari {scanPageImages.length}</span>
+                          </div>
+                        )}
+                        <div className={file?.name?.endsWith(".pdf") ? "p-4" : ""}>
+                          <img src={imgSrc} alt={`Halaman ${i + 1}`} className="max-w-[90vw] max-h-[80vh] object-contain" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <img src={filePreview} alt="Full preview" className="rounded-lg shadow-2xl transition-transform" style={{ transform: `scale(${fullPreviewZoom / 100})`, maxWidth: "90vw", maxHeight: "85vh", objectFit: "contain" }} onClick={(e) => e.stopPropagation()} />
+                  </div>
+                )}
               </div>
             </div>
           )}
