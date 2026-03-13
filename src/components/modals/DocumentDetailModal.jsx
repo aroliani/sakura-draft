@@ -4,6 +4,7 @@ import { useState } from "react";
 import PdfPreviewOverlay from "./PdfPreviewOverlay";
 import { useApp } from "@/contexts/AppContext";
 import { QRCodeSVG } from "qrcode.react";
+import { buildVerifyUrl } from "@/lib/verifyToken";
 
 const STATUS_COLORS = { Menunggu: "bg-sakura-warning/20 text-sakura-warning", Disetujui: "bg-sakura-success/20 text-sakura-success", Ditolak: "bg-destructive/20 text-destructive", Diarsipkan: "bg-muted text-muted-foreground" };
 const ROLE_BADGE = { "Operator/TU": "bg-primary/10 text-primary border border-primary/20", "Kepala Sekolah": "bg-sakura-success/10 text-sakura-success border border-sakura-success/20", "Guru": "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800", "Sistem": "bg-muted text-muted-foreground border border-border" };
