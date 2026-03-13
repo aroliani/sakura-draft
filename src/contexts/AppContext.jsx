@@ -156,7 +156,7 @@ export const AppProvider = ({ children }) => {
     );
     const doc = documents.find((d) => d.id === docId);
     if (doc) {
-      setNotifications((prev) => [{ id: Date.now(), message: `Dokumen '${doc.judul}' telah disetujui dan diarsipkan`, time: new Date().toISOString(), read: false, type: "approval", docId }, ...prev]);
+      setNotifications((prev) => [{ id: Date.now(), message: `Dokumen '${doc.judul}' telah disetujui, diarsipkan, dan QR Code verifikasi telah dibuat`, time: new Date().toISOString(), read: false, type: "approval", docId }, ...prev]);
     }
   };
 
