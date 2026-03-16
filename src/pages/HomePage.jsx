@@ -71,6 +71,7 @@ export default function HomePage() {
           minHeight: "100vh",
           overflowX: "hidden",
           overflowY: "visible",
+          zIndex: 3,
           background: "radial-gradient(ellipse at 50% 40%, #FFF0F3 0%, #FFE4EC 60%, #FFEFF5 100%)",
         }}
       >
