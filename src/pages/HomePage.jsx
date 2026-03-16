@@ -71,6 +71,7 @@ export default function HomePage() {
           minHeight: "100vh",
           overflowX: "hidden",
           overflowY: "visible",
+          zIndex: 3,
           background: "radial-gradient(ellipse at 50% 40%, #FFF0F3 0%, #FFE4EC 60%, #FFEFF5 100%)",
         }}
       >
@@ -171,8 +172,9 @@ export default function HomePage() {
 
       {/* ── Feature sections ── */}
       <div
-        className="relative z-10"
+        className="relative"
         style={{
+          zIndex: 2,
           background: "linear-gradient(180deg, #FFE4EC 0%, #FFF0F5 30%, #FFF5F8 60%, #FFFFFF 100%)",
         }}
       >
