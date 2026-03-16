@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,91 +6,103 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    --background: 210 20% 98%;
+    --foreground: 215 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 215 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 215 25% 10%;
 
-    --primary: 345 42% 38%;
+    --primary: 345 61% 30%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 345 25% 95%;
-    --secondary-foreground: 345 42% 32%;
+    --secondary: 345 20% 95%;
+    --secondary-foreground: 345 50% 28%;
 
-    --muted: 345 18% 94%;
-    --muted-foreground: 0 0% 49%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
 
     --accent: 345 45% 52%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 345 18% 90%;
-    --input: 345 18% 88%;
-    --ring: 345 42% 38%;
+    --border: 220 13% 91%;
+    --input: 220 13% 87%;
+    --ring: 345 61% 30%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    --sakura-success: 155 54% 40%;
-    --sakura-warning: 35 86% 59%;
-    --sakura-soft: 345 35% 96%;
+    --sakura-success: 142 71% 35%;
+    --sakura-warning: 38 92% 50%;
+    --sakura-soft: 345 30% 97%;
+    --sakura-info: 217 91% 60%;
 
-    --sidebar-background: 345 40% 32%;
-    --sidebar-foreground: 0 0% 95%;
+    --sidebar-background: 345 55% 22%;
+    --sidebar-foreground: 345 10% 92%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 345 40% 32%;
-    --sidebar-accent: 345 35% 40%;
+    --sidebar-primary-foreground: 345 55% 22%;
+    --sidebar-accent: 345 40% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 345 30% 42%;
-    --sidebar-ring: 345 42% 45%;
+    --sidebar-border: 345 35% 30%;
+    --sidebar-ring: 345 42% 40%;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
   }
 
   .dark {
-    --background: 0 0% 9%;
-    --foreground: 0 0% 92%;
+    --background: 220 15% 8%;
+    --foreground: 210 20% 92%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 92%;
+    --card: 220 15% 11%;
+    --card-foreground: 210 20% 92%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 92%;
+    --popover: 220 15% 11%;
+    --popover-foreground: 210 20% 92%;
 
-    --primary: 345 38% 42%;
+    --primary: 345 50% 42%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 345 22% 18%;
-    --secondary-foreground: 345 22% 85%;
+    --secondary: 345 18% 16%;
+    --secondary-foreground: 345 18% 80%;
 
-    --muted: 345 12% 18%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 220 12% 16%;
+    --muted-foreground: 215 12% 55%;
 
-    --accent: 345 38% 40%;
+    --accent: 345 40% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 50%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 345 12% 22%;
-    --input: 345 12% 25%;
-    --ring: 345 38% 42%;
+    --border: 220 12% 20%;
+    --input: 220 12% 22%;
+    --ring: 345 50% 42%;
 
-    --sakura-success: 155 54% 45%;
-    --sakura-warning: 35 86% 55%;
-    --sakura-soft: 345 18% 16%;
+    --sakura-success: 142 60% 42%;
+    --sakura-warning: 38 86% 52%;
+    --sakura-soft: 345 15% 14%;
+    --sakura-info: 217 80% 55%;
 
-    --sidebar-background: 345 38% 14%;
-    --sidebar-foreground: 0 0% 92%;
+    --sidebar-background: 345 45% 12%;
+    --sidebar-foreground: 345 8% 90%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 345 38% 14%;
-    --sidebar-accent: 345 30% 22%;
+    --sidebar-primary-foreground: 345 45% 12%;
+    --sidebar-accent: 345 30% 20%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 345 25% 24%;
-    --sidebar-ring: 345 38% 35%;
+    --sidebar-border: 345 20% 22%;
+    --sidebar-ring: 345 38% 30%;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.15);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.15);
   }
 }
 
@@ -100,14 +112,46 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: var(--base-font-size, 15px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  .glass {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
   }
 }

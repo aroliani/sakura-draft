@@ -1,12 +1,14 @@
+import { motion } from "framer-motion";
+
 const VARIANT_STYLES = {
-  default: "border-primary/10 hover:border-primary/30",
-  warning: "border-sakura-warning/20 hover:border-sakura-warning/40",
-  success: "border-sakura-success/20 hover:border-sakura-success/40",
-  muted: "border-border hover:border-primary/20",
+  default: "border-border hover:border-primary/30",
+  warning: "border-border hover:border-sakura-warning/40",
+  success: "border-border hover:border-sakura-success/40",
+  muted: "border-border hover:border-muted-foreground/30",
 };
 
 const ICON_STYLES = {
-  default: "bg-secondary text-primary",
+  default: "bg-primary/10 text-primary",
   warning: "bg-sakura-warning/10 text-sakura-warning",
   success: "bg-sakura-success/10 text-sakura-success",
   muted: "bg-muted text-muted-foreground",
@@ -14,12 +16,21 @@ const ICON_STYLES = {
 
 export default function DashboardCard({ title, value, icon: Icon, onClick, variant = "default" }) {
   return (
-    <button onClick={onClick} aria-label={title} className={`bg-card rounded-xl border-2 p-5 text-left transition-all hover:shadow-lg hover:-translate-y-0.5 ${VARIANT_STYLES[variant]}`}>
+    <motion.button
+      onClick={onClick}
+      aria-label={title}
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      className={`bg-card rounded-2xl border p-5 text-left transition-shadow duration-300 hover:shadow-card-hover ${VARIANT_STYLES[variant]}`}
+    >
       <div className="flex items-center justify-between">
-        <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${ICON_STYLES[variant]}`}><Icon size={22} /></div>
-        <span className="text-3xl font-extrabold text-foreground">{value}</span>
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${ICON_STYLES[variant]}`}>
+          <Icon size={22} />
+        </div>
+        <span className="text-3xl font-extrabold text-foreground tabular-nums tracking-tight">{value}</span>
       </div>
-      <div className="mt-3 text-sm font-medium text-muted-foreground">{title}</div>
-    </button>
+      <div className="mt-3 text-[13px] font-medium text-muted-foreground">{title}</div>
+    </motion.button>
   );
 }
