@@ -2,38 +2,36 @@ import { useState } from "react";
 
 /**
  * Cinematic SVG cherry blossom branch with 3D flowers.
- * Labels only appear on hover as elegant tooltips.
+ * Flowers are well-spaced with no overlapping.
+ * Click any flower to burst petals + scroll to section (if interactive).
  */
 
-/* ── Flower positions (in SVG viewBox 0 0 1200 800) ── */
+/* ── Flower positions — well-spaced, no overlap (viewBox 0 0 1200 800) ── */
 export const FLOWER_NODES = [
-  { cx: 245, cy: 275, size: 75, rot: -10, section: "about", label: "Apa itu SAKURA?" },
-  { cx: 365, cy: 240, size: 72, rot: 15, section: "why", label: "Arsip Digital" },
-  { cx: 480, cy: 140, size: 78, rot: -5, section: "workflow", label: "Alur Persetujuan" },
-  { cx: 660, cy: 150, size: 74, rot: 20, section: "security", label: "Keamanan & QR" },
-  { cx: 520, cy: 458, size: 72, rot: -15, section: "school", label: "SMP Negeri 4" },
-  { cx: 545, cy: 110, size: 48, rot: 30, section: null, label: null },
-  { cx: 710, cy: 130, size: 45, rot: -25, section: null, label: null },
-  { cx: 575, cy: 475, size: 46, rot: 10, section: null, label: null },
-  { cx: 650, cy: 230, size: 50, rot: -20, section: null, label: null },
-  { cx: 720, cy: 226, size: 42, rot: 5, section: null, label: null },
-  { cx: 650, cy: 175, size: 50, rot: -30, section: null, label: null },
-  { cx: 180, cy: 316, size: 44, rot: 12, section: null, label: null },
-  { cx: 450, cy: 400, size: 48, rot: -8, section: null, label: null },
-  { cx: 300, cy: 290, size: 40, rot: 25, section: null, label: null },
-  { cx: 420, cy: 170, size: 42, rot: -18, section: null, label: null },
-  { cx: 590, cy: 145, size: 40, rot: 8, section: null, label: null },
-  { cx: 500, cy: 430, size: 38, rot: -12, section: null, label: null },
+  // Interactive flowers (large, 75-80px)
+  { cx: 210, cy: 310, size: 78, rot: -10, section: "about", label: "Apa itu SAKURA?" },
+  { cx: 370, cy: 225, size: 76, rot: 15, section: "why", label: "Arsip Digital" },
+  { cx: 500, cy: 140, size: 78, rot: -5, section: "workflow", label: "Alur Persetujuan" },
+  { cx: 665, cy: 155, size: 76, rot: 20, section: "security", label: "Keamanan & QR" },
+  { cx: 505, cy: 460, size: 76, rot: -15, section: "school", label: "SMP Negeri 4" },
+  // Decorative flowers (small, 42-50px) — well spaced
+  { cx: 150, cy: 370, size: 44, rot: 12, section: null, label: null },
+  { cx: 290, cy: 280, size: 46, rot: 25, section: null, label: null },
+  { cx: 435, cy: 185, size: 44, rot: -18, section: null, label: null },
+  { cx: 575, cy: 115, size: 42, rot: 8, section: null, label: null },
+  { cx: 640, cy: 235, size: 48, rot: -20, section: null, label: null },
+  { cx: 720, cy: 145, size: 42, rot: 5, section: null, label: null },
+  { cx: 440, cy: 400, size: 44, rot: -8, section: null, label: null },
+  { cx: 575, cy: 475, size: 42, rot: 10, section: null, label: null },
 ];
 
 const BUD_POSITIONS = [
-  { cx: 220, cy: 300, size: 9, rot: -20 },
-  { cx: 400, cy: 205, size: 10, rot: 15 },
-  { cx: 500, cy: 155, size: 8, rot: -10 },
-  { cx: 580, cy: 195, size: 9, rot: 25 },
-  { cx: 690, cy: 140, size: 8, rot: -15 },
+  { cx: 180, cy: 340, size: 9, rot: -20 },
+  { cx: 330, cy: 250, size: 10, rot: 15 },
+  { cx: 465, cy: 160, size: 8, rot: -10 },
+  { cx: 600, cy: 190, size: 9, rot: 25 },
+  { cx: 695, cy: 148, size: 8, rot: -15 },
   { cx: 470, cy: 430, size: 9, rot: 10 },
-  { cx: 620, cy: 170, size: 8, rot: -5 },
 ];
 
 function scrollToSection(id) {
@@ -46,7 +44,7 @@ const STAMEN_TIPS = [
   [45, 65], [37, 57], [35, 45], [40, 35],
 ];
 
-function renderFlower(node, hoveredId, setHoveredId) {
+function renderFlower(node, hoveredId, setHoveredId, onFlowerClick) {
   const { cx, cy, size, rot, section, label } = node;
   const isInteractive = !!section;
   const isHovered = hoveredId === section;
@@ -54,18 +52,25 @@ function renderFlower(node, hoveredId, setHoveredId) {
   const uid = `fl-${cx}-${cy}`;
   const svgSize = size;
 
+  const handleClick = (e) => {
+    // Always trigger burst
+    if (onFlowerClick) onFlowerClick(e);
+    // Scroll if interactive
+    if (isInteractive) scrollToSection(section);
+  };
+
   return (
     <g
       key={uid}
       className={isInteractive ? "sakura-flower-interactive" : ""}
       style={{
-        cursor: isInteractive ? "pointer" : "default",
+        cursor: "pointer",
         transform: `translate(${cx - svgSize / 2}px, ${cy - svgSize / 2}px) scale(${scale})`,
         transformOrigin: `${svgSize / 2}px ${svgSize / 2}px`,
         transition: "transform 0.3s ease",
         opacity: isInteractive ? 1 : 0.85,
       }}
-      onClick={isInteractive ? () => scrollToSection(section) : undefined}
+      onClick={handleClick}
       onMouseEnter={isInteractive ? () => setHoveredId(section) : undefined}
       onMouseLeave={isInteractive ? () => setHoveredId(null) : undefined}
     >
@@ -167,7 +172,7 @@ function renderBud(bud) {
   );
 }
 
-export default function SakuraBranch() {
+export default function SakuraBranch({ onFlowerClick }) {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
@@ -229,7 +234,7 @@ export default function SakuraBranch() {
       {BUD_POSITIONS.map((bud) => renderBud(bud))}
 
       {/* ── FLOWERS ── */}
-      {FLOWER_NODES.map((node) => renderFlower(node, hoveredId, setHoveredId))}
+      {FLOWER_NODES.map((node) => renderFlower(node, hoveredId, setHoveredId, onFlowerClick))}
     </svg>
   );
 }

@@ -396,6 +396,46 @@
   }
 }
 
+/* Petal burst animation (click flowers) */
+@keyframes petalBurst {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  15% {
+    transform: translate(
+      calc(var(--burst-x) * 50px),
+      calc(var(--burst-y) * 50px)
+    ) rotate(180deg) scale(0.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(
+      calc(var(--sway) * 1px),
+      200vh
+    ) rotate(var(--spin, 720deg)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Scan line for QR mockup */
+@keyframes scanLine {
+  0% { top: 10%; opacity: 0.6; }
+  100% { top: 90%; opacity: 0; }
+}
+
+/* Step pulse for workflow */
+@keyframes stepPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.3); opacity: 0; }
+}
+
+/* Tree sway */
+@keyframes sway {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
 /* Bloom-in animation for section cards */
 @keyframes bloomIn {
   0% {
