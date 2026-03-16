@@ -4,6 +4,7 @@ import { useApp } from "@/contexts/AppContext";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import logoSakura from "@/assets/logo_sakura.png";
+import SakuraPetals from "@/components/SakuraPetals";
 import OtpPage from "./OtpPage";
 
 export default function LoginPage() {
@@ -38,8 +39,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-center w-1/2 bg-primary px-12 py-16 relative overflow-hidden">
+      {/* Left panel — deep maroon/purple gradient */}
+      <div className="hidden lg:flex flex-col justify-center w-1/2 bg-gradient-to-br from-sakura-maroon via-primary to-sakura-violet px-12 py-16 relative overflow-hidden">
+        <SakuraPetals count={12} />
         <div className="absolute top-0 right-0 w-80 h-80 bg-primary-foreground/5 rounded-full -translate-y-1/3 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-56 h-56 bg-primary-foreground/5 rounded-full translate-y-1/2 -translate-x-1/4" />
         <div className="relative">
@@ -61,7 +63,7 @@ export default function LoginPage() {
           <div className="mt-12 space-y-2.5">
             {[["Arsip Digital", "Simpan dokumen secara aman"], ["Alur Persetujuan", "Proses transparan dan akuntabel"], ["Scan & Upload", "Digitalisasi dokumen fisik"], ["Keamanan RBAC", "Kontrol akses berbasis peran"]].map(([title, desc]) => (
               <div key={title} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10">
-                <div className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-sakura-pink shrink-0" />
                 <div>
                   <span className="text-primary-foreground font-semibold text-sm">{title}</span>
                   <span className="text-primary-foreground/50 text-sm"> · {desc}</span>
@@ -69,7 +71,7 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
-          <p className="mt-auto text-primary-foreground/30 text-[11px] pt-8 font-medium">© 2026 SAKURA · President University Capstone Project</p>
+          <p className="mt-auto text-primary-foreground/30 text-[11px] pt-8 font-medium">© 2026 SAKURA · Developed by Group 5</p>
         </div>
       </div>
 

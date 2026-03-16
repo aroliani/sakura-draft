@@ -6,7 +6,7 @@ export default {
   theme: {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
-      fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] },
+      fontFamily: { sans: ['Poppins', 'system-ui', '-apple-system', 'sans-serif'] },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -31,6 +31,10 @@ export default {
           warning: "hsl(var(--sakura-warning))",
           soft: "hsl(var(--sakura-soft))",
           info: "hsl(var(--sakura-info))",
+          purple: "hsl(var(--sakura-purple))",
+          maroon: "hsl(var(--sakura-maroon))",
+          pink: "hsl(var(--sakura-pink))",
+          violet: "hsl(var(--sakura-violet))",
         },
       },
       borderRadius: {
