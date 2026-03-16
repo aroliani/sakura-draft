@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 230 25% 10%;
+    --background: 340 33% 99%;
+    --foreground: 220 26% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 230 25% 10%;
+    --card-foreground: 220 26% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 10%;
+    --popover-foreground: 220 26% 14%;
 
-    --primary: 270 60% 31%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 340 73% 42%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 20% 95%;
-    --secondary-foreground: 270 50% 28%;
+    --secondary: 340 30% 95%;
+    --secondary-foreground: 340 60% 35%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 340 15% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 300 55% 45%;
+    --accent: 340 82% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 87%;
-    --ring: 270 60% 31%;
+    --border: 340 12% 90%;
+    --input: 340 12% 87%;
+    --ring: 340 73% 42%;
 
     --radius: 0.75rem;
 
     --sakura-success: 142 71% 35%;
     --sakura-warning: 38 92% 50%;
-    --sakura-soft: 270 30% 97%;
-    --sakura-info: 217 91% 60%;
-    --sakura-purple: 270 60% 31%;
-    --sakura-maroon: 350 42% 26%;
-    --sakura-pink: 330 60% 65%;
-    --sakura-violet: 280 50% 40%;
+    --sakura-soft: 340 30% 97%;
+    --sakura-info: 340 60% 55%;
+    --sakura-purple: 340 73% 42%;
+    --sakura-maroon: 340 65% 30%;
+    --sakura-pink: 340 82% 52%;
+    --sakura-violet: 340 50% 38%;
 
-    --sidebar-background: 350 42% 26%;
-    --sidebar-foreground: 350 10% 92%;
+    --sidebar-background: 340 65% 30%;
+    --sidebar-foreground: 340 10% 92%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 350 42% 26%;
-    --sidebar-accent: 350 35% 35%;
+    --sidebar-primary-foreground: 340 65% 30%;
+    --sidebar-accent: 340 50% 38%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 350 30% 34%;
-    --sidebar-ring: 350 42% 40%;
+    --sidebar-border: 340 40% 36%;
+    --sidebar-ring: 340 55% 42%;
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
@@ -61,51 +61,51 @@
   }
 
   .dark {
-    --background: 240 15% 8%;
-    --foreground: 210 20% 92%;
+    --background: 340 10% 8%;
+    --foreground: 340 10% 92%;
 
-    --card: 240 15% 11%;
-    --card-foreground: 210 20% 92%;
+    --card: 340 10% 11%;
+    --card-foreground: 340 10% 92%;
 
-    --popover: 240 15% 11%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 340 10% 11%;
+    --popover-foreground: 340 10% 92%;
 
-    --primary: 270 50% 50%;
+    --primary: 340 65% 50%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 270 18% 16%;
-    --secondary-foreground: 270 18% 80%;
+    --secondary: 340 18% 16%;
+    --secondary-foreground: 340 18% 80%;
 
-    --muted: 240 12% 16%;
-    --muted-foreground: 215 12% 55%;
+    --muted: 340 10% 16%;
+    --muted-foreground: 340 8% 55%;
 
-    --accent: 300 45% 50%;
+    --accent: 340 60% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 12% 20%;
-    --input: 240 12% 22%;
-    --ring: 270 50% 50%;
+    --border: 340 10% 20%;
+    --input: 340 10% 22%;
+    --ring: 340 65% 50%;
 
     --sakura-success: 142 60% 42%;
     --sakura-warning: 38 86% 52%;
-    --sakura-soft: 270 15% 14%;
-    --sakura-info: 217 80% 55%;
-    --sakura-purple: 270 50% 50%;
-    --sakura-maroon: 350 35% 20%;
-    --sakura-pink: 330 50% 55%;
-    --sakura-violet: 280 40% 45%;
+    --sakura-soft: 340 10% 14%;
+    --sakura-info: 340 50% 50%;
+    --sakura-purple: 340 60% 50%;
+    --sakura-maroon: 340 50% 22%;
+    --sakura-pink: 340 55% 55%;
+    --sakura-violet: 340 40% 45%;
 
-    --sidebar-background: 350 40% 14%;
-    --sidebar-foreground: 350 8% 90%;
+    --sidebar-background: 340 50% 14%;
+    --sidebar-foreground: 340 8% 90%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 350 40% 14%;
-    --sidebar-accent: 350 30% 22%;
+    --sidebar-primary-foreground: 340 50% 14%;
+    --sidebar-accent: 340 35% 22%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 350 20% 24%;
-    --sidebar-ring: 350 38% 30%;
+    --sidebar-border: 340 25% 24%;
+    --sidebar-ring: 340 45% 30%;
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.15);
@@ -214,4 +214,25 @@
     animation: none !important;
     display: none !important;
   }
+}
+
+/* 3D blossom node animations */
+@keyframes blossom-float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0) rotateX(0deg) rotateY(0deg); }
+  50% { transform: translate(-50%, -50%) translateY(-4px) rotateX(5deg) rotateY(5deg); }
+}
+
+@keyframes blossom-glow {
+  0%, 100% { box-shadow: 0 0 8px hsl(340 80% 70% / 0.2); }
+  50% { box-shadow: 0 0 20px hsl(340 80% 70% / 0.45); }
+}
+
+.blossom-3d {
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+
+.blossom-3d:hover .blossom-circle {
+  animation: blossom-glow 1.5s ease-in-out infinite;
+  transform: scale(1.15) rotateX(8deg) rotateY(-8deg);
 }
