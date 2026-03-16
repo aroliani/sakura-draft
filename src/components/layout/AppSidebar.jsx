@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { LayoutDashboard, Upload, Archive, GitBranch, Users, Shield, FileText, Settings, PanelLeftClose, PanelLeft } from "lucide-react";
 import logoSakura from "@/assets/logo_sakura.png";
 import { useApp } from "@/contexts/AppContext";
@@ -27,7 +27,7 @@ export default function AppSidebar() {
       initial={false}
       animate={{ width: collapsed ? 72 : 240 }}
       transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-      className="min-h-screen bg-sidebar flex flex-col shrink-0 overflow-hidden border-r border-sidebar-border/50"
+      className="sticky top-0 h-screen bg-sidebar flex flex-col shrink-0 overflow-hidden border-r border-sidebar-border/50"
     >
       {/* Header */}
       <div className="px-3 pt-5 pb-3">
@@ -68,7 +68,7 @@ export default function AppSidebar() {
       <div className="mx-4 h-px bg-sidebar-border/60" />
 
       {/* Nav items */}
-      <nav className="flex-1 px-2 mt-3 space-y-1">
+      <nav className="flex-1 px-2 mt-3 space-y-1 overflow-y-auto scrollbar-thin">
         {visibleItems.map((item) => {
           const active = location.pathname === item.path;
           return (
