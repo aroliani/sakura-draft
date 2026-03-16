@@ -1,41 +1,44 @@
 import { useState } from "react";
 
 /**
- * Cinematic SVG cherry blossom branch with 3D-style flowers.
- * Uses the exact petal path from the reference template.
+ * Cinematic SVG cherry blossom branch spanning full width with 3D flowers.
+ * Branch extends from left edge to upper-right near navbar.
  */
 
 /* ── Flower positions (in SVG viewBox 0 0 1200 800) ── */
 export const FLOWER_NODES = [
-  // Interactive flowers (linked to sections) — larger sizes
-  { cx: 245, cy: 275, size: 65, rot: -10, section: "about", label: "Apa itu SAKURA?" },
-  { cx: 365, cy: 240, size: 60, rot: 15, section: "why", label: "Arsip Digital" },
-  { cx: 480, cy: 140, size: 70, rot: -5, section: "workflow", label: "Alur Persetujuan" },
-  { cx: 660, cy: 150, size: 62, rot: 20, section: "security", label: "Keamanan & QR" },
-  { cx: 520, cy: 458, size: 60, rot: -15, section: "school", label: "SMP Negeri 4" },
+  // Interactive flowers — larger sizes, with glow
+  { cx: 245, cy: 275, size: 75, rot: -10, section: "about", label: "Apa itu SAKURA?" },
+  { cx: 400, cy: 200, size: 72, rot: 15, section: "why", label: "Arsip Digital" },
+  { cx: 560, cy: 120, size: 78, rot: -5, section: "workflow", label: "Alur Persetujuan" },
+  { cx: 850, cy: 80, size: 74, rot: 20, section: "security", label: "Keamanan & QR" },
+  { cx: 520, cy: 458, size: 72, rot: -15, section: "school", label: "SMP Negeri 4" },
   // Decorative flowers — smaller, no interaction
-  { cx: 545, cy: 110, size: 48, rot: 30, section: null, label: null },
-  { cx: 710, cy: 130, size: 45, rot: -25, section: null, label: null },
+  { cx: 640, cy: 95, size: 48, rot: 30, section: null, label: null },
+  { cx: 920, cy: 70, size: 46, rot: -25, section: null, label: null },
   { cx: 575, cy: 475, size: 46, rot: 10, section: null, label: null },
-  { cx: 650, cy: 230, size: 50, rot: -20, section: null, label: null },
-  { cx: 720, cy: 226, size: 42, rot: 5, section: null, label: null },
-  { cx: 650, cy: 175, size: 50, rot: -30, section: null, label: null },
+  { cx: 750, cy: 110, size: 50, rot: -20, section: null, label: null },
+  { cx: 1000, cy: 65, size: 44, rot: 5, section: null, label: null },
+  { cx: 700, cy: 140, size: 48, rot: -30, section: null, label: null },
   { cx: 180, cy: 316, size: 44, rot: 12, section: null, label: null },
   { cx: 450, cy: 400, size: 48, rot: -8, section: null, label: null },
-  { cx: 300, cy: 290, size: 40, rot: 25, section: null, label: null },
-  { cx: 420, cy: 170, size: 42, rot: -18, section: null, label: null },
-  { cx: 590, cy: 145, size: 40, rot: 8, section: null, label: null },
+  { cx: 300, cy: 250, size: 42, rot: 25, section: null, label: null },
+  { cx: 480, cy: 155, size: 44, rot: -18, section: null, label: null },
+  { cx: 800, cy: 100, size: 42, rot: 8, section: null, label: null },
   { cx: 500, cy: 430, size: 38, rot: -12, section: null, label: null },
+  { cx: 960, cy: 55, size: 40, rot: 15, section: null, label: null },
+  { cx: 1050, cy: 75, size: 38, rot: -10, section: null, label: null },
 ];
 
 const BUD_POSITIONS = [
   { cx: 220, cy: 300, size: 9, rot: -20 },
-  { cx: 400, cy: 205, size: 10, rot: 15 },
-  { cx: 500, cy: 155, size: 8, rot: -10 },
-  { cx: 580, cy: 195, size: 9, rot: 25 },
-  { cx: 690, cy: 140, size: 8, rot: -15 },
+  { cx: 430, cy: 180, size: 10, rot: 15 },
+  { cx: 600, cy: 130, size: 8, rot: -10 },
+  { cx: 780, cy: 95, size: 9, rot: 25 },
+  { cx: 900, cy: 60, size: 8, rot: -15 },
   { cx: 470, cy: 430, size: 9, rot: 10 },
-  { cx: 620, cy: 170, size: 8, rot: -5 },
+  { cx: 680, cy: 120, size: 8, rot: -5 },
+  { cx: 1020, cy: 60, size: 7, rot: 20 },
 ];
 
 function scrollToSection(id) {
@@ -43,32 +46,28 @@ function scrollToSection(id) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ── Stamen endpoints (9 stamens radiating from center 50,50 in viewBox 100) ── */
 const STAMEN_TIPS = [
   [50, 33], [60, 35], [65, 45], [63, 57], [55, 65],
   [45, 65], [37, 57], [35, 45], [40, 35],
 ];
 
-/** Render a single 3D cherry blossom using the exact template */
 function renderFlower(node, hoveredId, setHoveredId) {
   const { cx, cy, size, rot, section, label } = node;
   const isInteractive = !!section;
   const isHovered = hoveredId === section;
-  const scale = isHovered ? 1.2 : 1;
+  const scale = isHovered ? 1.15 : 1;
   const uid = `fl-${cx}-${cy}`;
-  const svgSize = size; // size in SVG viewBox units
+  const svgSize = size;
 
   return (
     <g
       key={uid}
+      className={isInteractive ? "sakura-flower-interactive" : ""}
       style={{
         cursor: isInteractive ? "pointer" : "default",
         transform: `translate(${cx - svgSize / 2}px, ${cy - svgSize / 2}px) scale(${scale})`,
         transformOrigin: `${svgSize / 2}px ${svgSize / 2}px`,
-        transition: "transform 0.3s ease, filter 0.3s ease",
-        filter: isHovered
-          ? "drop-shadow(0 4px 14px rgba(200,80,100,0.5))"
-          : "drop-shadow(2px 4px 8px rgba(200,80,100,0.3))",
+        transition: "transform 0.3s ease",
         opacity: isInteractive ? 1 : 0.85,
       }}
       onClick={isInteractive ? () => scrollToSection(section) : undefined}
@@ -94,7 +93,6 @@ function renderFlower(node, hoveredId, setHoveredId) {
           </radialGradient>
         </defs>
 
-        {/* 5 petals */}
         {[0, 72, 144, 216, 288].map((angle) => (
           <g key={angle} transform={`rotate(${angle}, 50, 50)`}>
             <path
@@ -112,52 +110,46 @@ function renderFlower(node, hoveredId, setHoveredId) {
           </g>
         ))}
 
-        {/* Gold center */}
         <circle cx="50" cy="50" r="9" fill={`url(#cg-${uid})`} />
 
-        {/* Red stamens */}
         <g stroke="#C23A57" strokeWidth="1.2" opacity="0.7">
           {STAMEN_TIPS.map(([tx, ty], i) => (
             <line key={i} x1="50" y1="50" x2={tx} y2={ty} />
           ))}
         </g>
 
-        {/* Gold stamen tips */}
         {STAMEN_TIPS.map(([tx, ty], i) => (
           <circle key={`t${i}`} cx={tx} cy={ty} r="2" fill="#FFD700" opacity="0.9" />
         ))}
-
-        {/* Subtle breathing animation via CSS class */}
-        {isInteractive && !isHovered && (
-          <circle
-            cx="50" cy="50" r="48"
-            fill="none"
-            stroke="rgba(232,96,122,0.3)"
-            strokeWidth="2"
-            className="animate-pulse-ring"
-          />
-        )}
       </svg>
 
-      {/* Tooltip — always horizontal, positioned above flower */}
-      {isHovered && label && (
+      {/* Always-visible label for interactive flowers — perfectly horizontal */}
+      {isInteractive && label && (
         <foreignObject
-          x={-20} y={-30}
-          width={svgSize + 40} height="28"
+          x={0} y={-32}
+          width="1" height="1"
+          overflow="visible"
           style={{ overflow: "visible", pointerEvents: "none" }}
         >
           <div
+            className="sakura-flower-label"
             style={{
+              position: "absolute",
+              left: "50%",
+              bottom: "0",
+              transform: "translateX(-50%)",
               background: "#fff",
               color: "#C23A57",
-              fontSize: "12px",
-              fontWeight: 500,
-              padding: "4px 12px",
+              fontSize: "11px",
+              fontWeight: 600,
+              padding: "5px 14px",
               borderRadius: "20px",
               textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              boxShadow: "0 2px 12px rgba(194, 58, 87, 0.2)",
+              border: "1px solid rgba(194, 58, 87, 0.15)",
               whiteSpace: "nowrap",
-              transform: `rotate(${-rot}deg)`, // counter-rotate to stay horizontal
+              opacity: isHovered ? 1 : 0.9,
+              transition: "opacity 0.3s ease",
             }}
           >
             {label}
@@ -168,7 +160,6 @@ function renderFlower(node, hoveredId, setHoveredId) {
   );
 }
 
-/** Render a bud */
 function renderBud(bud) {
   const { cx, cy, size, rot } = bud;
   return (
@@ -211,31 +202,36 @@ export default function SakuraBranch() {
         </linearGradient>
       </defs>
 
-      {/* ── MAIN TRUNK ── */}
+      {/* ── MAIN TRUNK — extends from left to upper-right ── */}
       <path
-        d="M -60 420 C 40 400, 120 370, 200 340 C 280 310, 360 290, 440 270 C 520 250, 580 240, 650 235"
-        fill="none" stroke="url(#branchMain)" strokeWidth="22" strokeLinecap="round"
+        d="M -60 420 C 100 380, 250 300, 400 230 C 550 160, 700 110, 850 80 C 950 60, 1020 55, 1080 60"
+        fill="none" stroke="url(#branchMain)" strokeWidth="20" strokeLinecap="round"
       />
+      {/* Thicker base */}
       <path
-        d="M -60 420 C 20 405, 80 385, 160 360"
+        d="M -60 420 C 20 405, 80 385, 180 350"
         fill="none" stroke="url(#branchMain)" strokeWidth="28" strokeLinecap="round" opacity="0.7"
       />
 
       {/* ── SUB-BRANCHES ── */}
-      <path d="M 280 325 C 310 290, 340 250, 380 210 C 410 180, 440 160, 480 145" fill="none" stroke="url(#branchSub)" strokeWidth="12" strokeLinecap="round" />
-      <path d="M 440 270 C 480 250, 520 230, 560 200 C 590 180, 620 165, 660 155" fill="none" stroke="url(#branchSub)" strokeWidth="10" strokeLinecap="round" />
-      <path d="M 360 300 C 390 330, 420 360, 450 400 C 470 425, 490 445, 520 460" fill="none" stroke="url(#branchSub)" strokeWidth="11" strokeLinecap="round" />
-      <path d="M 550 245 C 580 220, 610 195, 650 175" fill="none" stroke="url(#branchSub)" strokeWidth="8" strokeLinecap="round" />
+      <path d="M 250 310 C 280 270, 320 230, 370 200 C 400 180, 430 165, 480 150" fill="none" stroke="url(#branchSub)" strokeWidth="12" strokeLinecap="round" />
+      <path d="M 500 185 C 530 160, 560 140, 600 120 C 630 105, 660 95, 700 90" fill="none" stroke="url(#branchSub)" strokeWidth="10" strokeLinecap="round" />
+      <path d="M 360 260 C 390 300, 420 360, 450 400 C 470 425, 490 445, 520 460" fill="none" stroke="url(#branchSub)" strokeWidth="11" strokeLinecap="round" />
+      <path d="M 700 100 C 740 85, 780 75, 830 70" fill="none" stroke="url(#branchSub)" strokeWidth="8" strokeLinecap="round" />
+      {/* New right-side sub-branch toward top-right */}
+      <path d="M 880 75 C 920 65, 960 58, 1000 60" fill="none" stroke="url(#branchSub)" strokeWidth="7" strokeLinecap="round" />
+      <path d="M 950 62 C 980 55, 1010 52, 1050 58" fill="none" stroke="url(#branchSub)" strokeWidth="6" strokeLinecap="round" />
 
       {/* ── TWIGS ── */}
       <path d="M 200 345 C 210 320, 225 300, 245 280" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M 320 305 C 330 280, 345 260, 365 245" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 480 145 C 500 130, 520 120, 545 115" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
+      <path d="M 320 275 C 340 255, 360 235, 400 205" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
+      <path d="M 480 150 C 495 135, 510 125, 530 118" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
       <path d="M 520 460 C 540 470, 555 475, 575 478" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 650 155 C 670 145, 690 138, 710 135" fill="none" stroke="url(#branchTwig)" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M 650 235 C 670 230, 695 228, 720 230" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" />
+      <path d="M 700 90 C 720 80, 745 72, 770 70" fill="none" stroke="url(#branchTwig)" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M 850 80 C 870 72, 890 68, 920 65" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
       <path d="M 150 370 C 155 350, 165 335, 180 320" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 600 210 C 615 195, 630 185, 650 178" fill="none" stroke="url(#branchTwig)" strokeWidth="3" strokeLinecap="round" />
+      <path d="M 640 100 C 660 88, 680 82, 700 80" fill="none" stroke="url(#branchTwig)" strokeWidth="3" strokeLinecap="round" />
+      <path d="M 1000 60 C 1020 55, 1040 58, 1060 65" fill="none" stroke="url(#branchTwig)" strokeWidth="3" strokeLinecap="round" />
 
       {/* ── BUDS ── */}
       {BUD_POSITIONS.map((bud) => renderBud(bud))}
