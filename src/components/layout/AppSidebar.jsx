@@ -33,11 +33,8 @@ export default function AppSidebar() {
       <div className="px-3 pt-5 pb-3">
         {collapsed ? (
           <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => setCollapsed(false)}
-              title="Perluas sidebar"
-              className="p-2 rounded-lg text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
-            >
+            <button onClick={() => setCollapsed(false)} title="Perluas sidebar"
+              className="p-2 rounded-lg text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200">
               <PanelLeft size={18} />
             </button>
             <button onClick={() => navigate("/home")} className="hover:opacity-80 transition-opacity">
@@ -53,18 +50,14 @@ export default function AppSidebar() {
               <div className="text-sidebar-primary font-bold text-sm tracking-wider">SAKURA</div>
               <div className="text-sidebar-foreground/50 text-[10px] font-medium">Document Management</div>
             </button>
-            <button
-              onClick={() => setCollapsed(true)}
-              title="Sembunyikan sidebar"
-              className="p-2 rounded-lg text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
-            >
+            <button onClick={() => setCollapsed(true)} title="Sembunyikan sidebar"
+              className="p-2 rounded-lg text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200">
               <PanelLeftClose size={18} />
             </button>
           </div>
         )}
       </div>
 
-      {/* Divider */}
       <div className="mx-4 h-px bg-sidebar-border/60" />
 
       {/* Nav items */}
@@ -102,10 +95,8 @@ export default function AppSidebar() {
           );
         })}
 
-        {/* Divider */}
         <div className="!my-4 mx-2 h-px bg-sidebar-border/60" />
 
-        {/* Settings */}
         <motion.button
           onClick={() => navigate("/settings")}
           title={collapsed ? "Pengaturan" : undefined}

@@ -1,18 +1,15 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { useState, useMemo, useCallback } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useState, useMemo } from "react";
 import { CalendarDays, Check, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format, startOfWeek, endOfWeek, addDays, eachDayOfInterval, startOfMonth, endOfMonth, eachMonthOfInterval, getDaysInMonth, isWithinInterval } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { format, startOfWeek, endOfWeek, addDays, eachDayOfInterval, startOfMonth, eachMonthOfInterval } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const STATUS_COLORS = {
-  Upload: "hsl(352 48% 28%)",
-  Disetujui: "hsl(155 54% 40%)",
-  Ditolak: "hsl(0 84% 60%)",
-  Menunggu: "hsl(35 86% 59%)",
-  Diarsipkan: "hsl(220 60% 50%)",
+  Disetujui: "hsl(142 71% 35%)",
+  Ditolak: "hsl(0 72% 51%)",
+  Menunggu: "hsl(38 92% 50%)",
 };
 
 const HARI = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
@@ -34,11 +31,9 @@ function generateDataForRange(startDate, endDate) {
   return {
     labels,
     dates,
-    uploads: days.map((_, i) => seed[i % seed.length]),
     disetujui: days.map((_, i) => [1, 2, 1, 1, 2, 1, 1, 2, 0, 1, 2, 1, 3, 1, 2, 1, 2, 1, 0, 1, 3, 1, 1, 2, 2, 1, 1, 0, 2, 2, 1][i % 31]),
     ditolak: days.map((_, i) => [0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0][i % 31]),
     menunggu: days.map((_, i) => [2, 2, 0, 3, 4, 1, 1, 2, 0, 2, 2, 1, 3, 1, 2, 0, 3, 2, 0, 3, 3, 0, 2, 3, 1, 1, 1, 1, 2, 2, 1][i % 31]),
-    diarsipkan: days.map((_, i) => [1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 2, 0, 1, 1, 1, 0, 0, 1, 2, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0][i % 31]),
   };
 }
 
@@ -46,21 +41,19 @@ function generateMonthlyAggData(startMonth, endMonth) {
   const months = eachMonthOfInterval({ start: startMonth, end: endMonth });
   const labels = [];
   const dates = [];
+  const seed = [45, 52, 38, 61, 55, 42, 48, 35, 58, 44, 50, 40];
 
   months.forEach((m) => {
     labels.push(`${BULAN_SHORT[m.getMonth()]} ${m.getFullYear()}`);
     dates.push(format(m, "yyyy-MM"));
   });
 
-  const seed = [45, 52, 38, 61, 55, 42, 48, 35, 58, 44, 50, 40];
   return {
     labels,
     dates,
-    uploads: months.map((_, i) => seed[i % seed.length]),
     disetujui: months.map((_, i) => Math.floor(seed[i % seed.length] * 0.4)),
     ditolak: months.map((_, i) => Math.floor(seed[i % seed.length] * 0.1)),
     menunggu: months.map((_, i) => Math.floor(seed[i % seed.length] * 0.25)),
-    diarsipkan: months.map((_, i) => Math.floor(seed[i % seed.length] * 0.25)),
   };
 }
 
@@ -76,32 +69,23 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
   const [monthTo, setMonthTo] = useState(startOfMonth(today));
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [monthPickerStep, setMonthPickerStep] = useState("from");
-  const [visibleLines, setVisibleLines] = useState(new Set(["Upload", "Disetujui", "Ditolak", "Menunggu", "Diarsipkan"]));
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(undefined);
+  const [visibleLines, setVisibleLines] = useState(new Set(["Disetujui", "Ditolak", "Menunggu"]));
 
   const source = useMemo(() => {
-    if (period === "weekly") {
-      return generateDataForRange(weekStart, weekEnd);
-    } else {
-      return generateMonthlyAggData(monthFrom, monthTo);
-    }
+    if (period === "weekly") return generateDataForRange(weekStart, weekEnd);
+    return generateMonthlyAggData(monthFrom, monthTo);
   }, [period, weekStart, weekEnd, monthFrom, monthTo]);
 
   const data = source.labels.map((label, i) => ({
     name: label,
     date: source.dates[i],
-    Upload: source.uploads[i],
     Disetujui: source.disetujui[i],
     Ditolak: source.ditolak[i],
     Menunggu: source.menunggu[i],
-    Diarsipkan: source.diarsipkan[i],
   }));
 
   const handleDotClick = (status) => (payload) => {
-    if (payload?.payload?.date) {
-      onDateClick(payload.payload.date, status);
-    }
+    if (payload?.payload?.date) onDateClick(payload.payload.date, status);
   };
 
   const handleLegendClick = (e) => {
@@ -109,20 +93,10 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
     if (!key) return;
     setVisibleLines((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) {
-        if (next.size > 1) next.delete(key);
-      } else {
-        next.add(key);
-      }
+      if (next.has(key)) { if (next.size > 1) next.delete(key); }
+      else next.add(key);
       return next;
     });
-  };
-
-  const handleDateSelect = (date) => {
-    if (!date) return;
-    setSelectedDate(date);
-    setDatePickerOpen(false);
-    onDateClick(format(date, "yyyy-MM-dd"));
   };
 
   const handleWeekDateSelect = (date) => {
@@ -147,8 +121,7 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
     const opts = [];
     for (let y = currentYear - 1; y <= currentYear + 1; y++) {
       for (let m = 0; m < 12; m++) {
-        const d = new Date(y, m, 1);
-        opts.push({ label: `${BULAN_SHORT[m]} ${y}`, date: d });
+        opts.push({ label: `${BULAN_SHORT[m]} ${y}`, date: new Date(y, m, 1) });
       }
     }
     return opts;
@@ -165,16 +138,10 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
         {payload.map((entry) => {
           const active = visibleLines.has(entry.value);
           return (
-            <button
-              key={entry.value}
-              onClick={() => handleLegendClick(entry)}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border",
-                active
-                  ? "border-border bg-card shadow-sm"
-                  : "border-transparent bg-muted/50 opacity-50"
-              )}
-            >
+            <button key={entry.value} onClick={() => handleLegendClick(entry)}
+              className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border",
+                active ? "border-border bg-card shadow-sm" : "border-transparent bg-muted/50 opacity-50"
+              )}>
               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
               {entry.value}
             </button>
@@ -196,20 +163,6 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1.5 border border-border rounded-md px-2.5 py-1.5 hover:bg-muted transition-colors">
-                <CalendarDays size={14} className="text-primary" />
-                <span className="text-xs font-medium text-foreground">
-                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Pilih Tanggal"}
-                </span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50 bg-popover" align="end" sideOffset={4}>
-              <Calendar mode="single" selected={selectedDate} onSelect={handleDateSelect} initialFocus className={cn("p-3 pointer-events-auto")} />
-            </PopoverContent>
-          </Popover>
-
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button onClick={() => setPeriod("weekly")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${period === "weekly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>Mingguan</button>
             <button onClick={() => setPeriod("monthly")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${period === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>Bulanan</button>
@@ -219,7 +172,7 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
             <Popover open={weekPickerOpen} onOpenChange={(o) => { setWeekPickerOpen(o); if (o) setWeekRangeStep("from"); }}>
               <PopoverTrigger asChild>
                 <button className="flex items-center gap-1.5 border border-border rounded-md px-2.5 py-1.5 hover:bg-muted transition-colors">
-                  <CalendarDays size={14} className="text-muted-foreground" />
+                  <CalendarDays size={14} className="text-primary" />
                   <span className="text-xs font-medium text-foreground">{weekLabel}</span>
                   <ChevronDown size={12} className="text-muted-foreground" />
                 </button>
@@ -245,32 +198,16 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
                   {monthPickerStep === "from" ? "Bulan mulai" : "Bulan akhir"}
                 </p>
                 {monthOptions.map((opt) => (
-                  <button
-                    key={opt.label}
-                    onClick={() => {
-                      if (monthPickerStep === "from") {
-                        setMonthFrom(opt.date);
-                        setMonthPickerStep("to");
-                      } else {
-                        const to = opt.date >= monthFrom ? opt.date : monthFrom;
-                        setMonthTo(to);
-                        setMonthPickerStep("from");
-                        setMonthPickerOpen(false);
-                      }
-                    }}
-                    className={cn(
-                      "w-full flex items-center justify-between px-3 py-2 text-xs rounded-md transition-colors",
-                      (monthPickerStep === "from" && opt.date.getTime() === monthFrom.getTime()) ||
-                      (monthPickerStep === "to" && opt.date.getTime() === monthTo.getTime())
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-foreground hover:bg-muted"
-                    )}
-                  >
+                  <button key={opt.label} onClick={() => {
+                    if (monthPickerStep === "from") { setMonthFrom(opt.date); setMonthPickerStep("to"); }
+                    else { setMonthTo(opt.date >= monthFrom ? opt.date : monthFrom); setMonthPickerStep("from"); setMonthPickerOpen(false); }
+                  }}
+                    className={cn("w-full flex items-center justify-between px-3 py-2 text-xs rounded-md transition-colors",
+                      (monthPickerStep === "from" && opt.date.getTime() === monthFrom.getTime()) || (monthPickerStep === "to" && opt.date.getTime() === monthTo.getTime())
+                        ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                    )}>
                     {opt.label}
-                    {((monthPickerStep === "from" && opt.date.getTime() === monthFrom.getTime()) ||
-                      (monthPickerStep === "to" && opt.date.getTime() === monthTo.getTime())) && (
-                      <Check size={14} />
-                    )}
+                    {((monthPickerStep === "from" && opt.date.getTime() === monthFrom.getTime()) || (monthPickerStep === "to" && opt.date.getTime() === monthTo.getTime())) && <Check size={14} />}
                   </button>
                 ))}
               </PopoverContent>
@@ -289,20 +226,14 @@ export default function ActivityChart({ onDateClick, onStatusClick }) {
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(350 15% 90%)" />
-          <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="hsl(0 0% 49%)" angle={-25} textAnchor="end" height={60} interval={data.length > 14 ? 2 : 0} />
-          <YAxis tick={{ fontSize: 12 }} stroke="hsl(0 0% 49%)" />
-          <Tooltip contentStyle={{ backgroundColor: "hsl(0 0% 100%)", border: "1px solid hsl(350 15% 90%)", borderRadius: "8px", fontSize: "13px" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(340 12% 90%)" />
+          <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="hsl(220 10% 46%)" angle={-25} textAnchor="end" height={60} interval={data.length > 14 ? 2 : 0} />
+          <YAxis tick={{ fontSize: 12 }} stroke="hsl(220 10% 46%)" />
+          <Tooltip contentStyle={{ backgroundColor: "hsl(0 0% 100%)", border: "1px solid hsl(340 12% 90%)", borderRadius: "8px", fontSize: "13px" }} />
           <Legend content={renderLegend} />
-          {["Upload", "Disetujui", "Ditolak", "Menunggu", "Diarsipkan"].map((key) => (
-            <Area
-              key={key}
-              type="monotone"
-              dataKey={key}
-              stroke={STATUS_COLORS[key]}
-              fill={`url(#gradient-${key})`}
-              strokeWidth={visibleLines.has(key) ? 2 : 0}
-              fillOpacity={visibleLines.has(key) ? 1 : 0}
+          {["Disetujui", "Ditolak", "Menunggu"].map((key) => (
+            <Area key={key} type="monotone" dataKey={key} stroke={STATUS_COLORS[key]} fill={`url(#gradient-${key})`}
+              strokeWidth={visibleLines.has(key) ? 2 : 0} fillOpacity={visibleLines.has(key) ? 1 : 0}
               dot={visibleLines.has(key) ? { r: 4, fill: STATUS_COLORS[key] } : false}
               activeDot={visibleLines.has(key) ? { r: 6, onClick: handleDotClick(key), cursor: "pointer" } : false}
               hide={!visibleLines.has(key)}
