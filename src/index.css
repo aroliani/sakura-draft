@@ -290,7 +290,7 @@
     opacity: 0.6;
   }
   100% {
-    transform: translate3d(var(--petal-drift, -50px), 100vh, 0)
+    transform: translate3d(var(--petal-drift, -50px), 110vh, 0)
       rotate(var(--petal-rotation, 400deg))
       rotateX(calc(var(--petal-tiltX, 20deg) * -1))
       scale(0.5);

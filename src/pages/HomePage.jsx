@@ -192,13 +192,13 @@ export default function HomePage() {
 
         {/* Scroll hint */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2.5, duration: 1 }}
         >
-          <span className="text-[11px] tracking-wide font-light" style={{ color: "#9B7A8A" }}>
-            Scroll untuk menjelajahi
+          <span className="text-[11px] tracking-wide font-medium" style={{ color: "#C2185B" }}>
+            🌸 Klik bunga untuk menjelajahi
           </span>
           <motion.div
             className="w-5 h-8 rounded-full border-2 flex items-start justify-center pt-1.5"
