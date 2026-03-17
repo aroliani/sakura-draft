@@ -11,8 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { CATEGORIES, DOCUMENT_TYPES, TAHUN_AJARAN_OPTIONS, CATEGORY_FORM_FIELDS, SURAT_TYPE_FORM_FIELDS, getAutoFolderPath, getFolderIdForDocument } from "@/data/mockData";
 import { Calendar } from "@/components/ui/calendar";
 
-export default function UploadForm({ onSuccess, onCancel }) {
-  const { uploadDocument, currentUser, generateDocumentNumber } = useApp();
+export default function UploadForm({ onSuccess, onCancel, selectedModule, guruUploadOwn, lockedNip, lockedTypeId }) {
+  const { uploadDocument, currentUser, generateDocumentNumber, users } = useApp();
   
   const { toast } = useToast();
   const navigate = useNavigate();
