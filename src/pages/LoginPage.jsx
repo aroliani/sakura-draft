@@ -4,7 +4,7 @@ import { useApp } from "@/contexts/AppContext";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import logoSakura from "@/assets/logo_sakura.png";
-import SakuraPetals from "@/components/SakuraPetals";
+import SakuraPetals from "@/components/sakura/SakuraPetals";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

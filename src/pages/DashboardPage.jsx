@@ -114,7 +114,7 @@ export default function DashboardPage() {
       </div>
 
       {listModal && !detailDoc && (
-        <DocumentListModal title={listModal.title} documents={listModal.docs} onClose={() => setListModal(null)} onSelectDocument={(doc) => setDetailDoc(doc)} />
+        <DocumentList title={listModal.title} documents={listModal.docs} onClose={() => setListModal(null)} onSelectDocument={(doc) => setDetailDoc(doc)} />
       )}
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
     </>

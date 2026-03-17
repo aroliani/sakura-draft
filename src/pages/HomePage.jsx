@@ -176,9 +176,7 @@ export default function HomePage() {
       >
         <div className="relative z-[2] max-w-5xl mx-auto px-6 py-24 space-y-24">
           <AboutSection />
-          <ArchiveSection />
-          <WorkflowSection />
-          <SecuritySection />
+          <FeaturesSection />
           <SchoolSection />
         </div>
       </div>
