@@ -169,7 +169,7 @@ export default function FallingPetals() {
         width: "100vw",
         height: "100vh",
         pointerEvents: "none",
-        zIndex: 1,
+        zIndex: 40,
       }}
       aria-hidden="true"
     />
