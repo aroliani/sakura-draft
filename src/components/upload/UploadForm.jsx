@@ -49,6 +49,10 @@ export default function UploadForm({ onSuccess, onCancel }) {
   }, [scanPageImages]);
   const [selectedTypeId, setSelectedTypeId] = useState(null);
 
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [isSensitif, setIsSensitif] = useState(false);
+  const [ownerNip, setOwnerNip] = useState("");
+
   const [form, setForm] = useState({
     nomorDokumen: "",
     judul: "",
