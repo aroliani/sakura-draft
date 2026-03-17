@@ -506,39 +506,41 @@
     opacity: 0.3;
   }
 }
-
 /* Continuously spawned falling petals */
-@keyframes fallingPetal {
+@keyframes sakuraPetalFall {
   0% {
     transform: translate(0px, 0px) rotate(0deg) scale(1);
   }
-  10% {
-    opacity: inherit;
-  }
-  25% {
+  20% {
     transform:
-      translate(calc(var(--sway-x) * 0.25), 20vh)
-      rotate(calc(var(--rot-end) * 0.25))
-      scale(0.95);
+      translate(calc(var(--sway) * 0.2), 18vh)
+      rotate(calc(var(--rot) * 0.2))
+      scale(0.97);
   }
-  50% {
+  40% {
     transform:
-      translate(calc(var(--sway-x) * 0.6), 48vh)
-      rotate(calc(var(--rot-end) * 0.5))
+      translate(calc(var(--sway) * 0.45), 38vh)
+      rotate(calc(var(--rot) * 0.4))
+      scale(0.94);
+  }
+  60% {
+    transform:
+      translate(calc(var(--sway) * 0.65), 57vh)
+      rotate(calc(var(--rot) * 0.6))
       scale(0.9);
   }
-  75% {
+  80% {
     transform:
-      translate(calc(var(--sway-x) * 0.85), 74vh)
-      rotate(calc(var(--rot-end) * 0.75))
-      scale(0.85);
+      translate(calc(var(--sway) * 0.85), 78vh)
+      rotate(calc(var(--rot) * 0.8))
+      scale(0.87);
     opacity: 0.3;
   }
   100% {
     transform:
-      translate(var(--sway-x), 105vh)
-      rotate(var(--rot-end))
-      scale(0.8);
+      translate(var(--sway), 108vh)
+      rotate(var(--rot))
+      scale(0.85);
     opacity: 0;
   }
 }
