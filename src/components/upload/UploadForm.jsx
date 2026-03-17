@@ -256,6 +256,44 @@ export default function UploadForm({ onSuccess, onCancel }) {
     <>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
+          {/* Urgent toggle */}
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">Tandai sebagai Urgent</span>
+              <button type="button" onClick={() => setIsUrgent(!isUrgent)} className={`relative w-11 h-6 rounded-full transition-colors ${isUrgent ? "bg-sakura-warning" : "bg-input"}`}>
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-background shadow transition-transform ${isUrgent ? "translate-x-5" : ""}`} />
+              </button>
+            </div>
+            {isUrgent && (
+              <div className="flex items-start gap-2.5 mt-3 p-3 rounded-lg bg-sakura-warning/10 border border-sakura-warning/30">
+                <AlertTriangle size={16} className="text-sakura-warning shrink-0 mt-0.5" />
+                <p className="text-[13px] text-sakura-warning">Dokumen ini akan ditandai URGENT dan mendapat prioritas review lebih cepat.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Sensitive toggle */}
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">Dokumen Sensitif (hanya bisa dilihat pemilik)</span>
+              <button type="button" onClick={() => setIsSensitif(!isSensitif)} className={`relative w-11 h-6 rounded-full transition-colors ${isSensitif ? "bg-primary" : "bg-input"}`}>
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-background shadow transition-transform ${isSensitif ? "translate-x-5" : ""}`} />
+              </button>
+            </div>
+            {isSensitif && (
+              <div className="mt-3 space-y-3">
+                <div className="flex items-start gap-2.5 p-3 rounded-lg bg-primary/[0.06] border border-primary/20">
+                  <Lock size={16} className="text-primary shrink-0 mt-0.5" />
+                  <p className="text-[13px] text-primary">Dokumen ini hanya dapat diakses oleh pemilik berdasarkan NIP.</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">NIP Pemilik Dokumen *</label>
+                  <input value={ownerNip} onChange={(e) => setOwnerNip(e.target.value)} placeholder="18 digit NIP" maxLength={18} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+            )}
+          </div>
+
           {autoFolderDisplay && (
             <div className="p-3 rounded-lg bg-secondary/50 border border-border text-sm">
               <span className="text-muted-foreground">Masukkan ke folder: </span>

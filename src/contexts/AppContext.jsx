@@ -272,10 +272,12 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider value={{
       currentUser, users, documents, rolePermissions, notifications, isLoggedIn, customFolders,
+      pendingUsers, activeUsers,
       login, logout, updateUserRole, updateUserAvatar, togglePermission, addAuditNote,
       hasPermission, approveDocument, rejectDocument, uploadDocument, archiveDocument,
       toggleFavorite, markNotificationRead, markAllNotificationsRead,
       addUser, updateUser, deleteUser, generateDocumentNumber, updateProfile, changePassword,
+      registerUser, activateUser, rejectRegistration,
       createFolder, editFolder, deleteFolder, editDocument, moveDocument, deleteDocument,
     }}>
       {children}

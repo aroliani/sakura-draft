@@ -48,6 +48,17 @@ export default function DocumentDetailModal({ document: doc, onClose }) {
                 <div key={label}><div className="text-muted-foreground text-xs">{label}</div>{label === "Pengunggah" ? (<div className="flex items-center gap-2 mt-0.5"><span className="font-medium text-foreground">{doc.pengunggah.nama}</span><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ROLE_BADGE[doc.pengunggah.role] || "bg-muted text-muted-foreground border border-border"}`}>{doc.pengunggah.role}</span></div>) : label === "Status" ? (<span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mt-0.5 ${STATUS_COLORS[doc.status]}`}>{doc.status}</span>) : (<div className="font-medium text-foreground">{val}</div>)}</div>
               ))}
             </div>
+            {/* Lokasi field */}
+            <div className="col-span-2">
+              <div className="text-muted-foreground text-xs mb-1">Lokasi</div>
+              <button
+                onClick={() => { onClose(); navigate(`/archive?kategori=${encodeURIComponent(doc.kategori)}`); }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-[13px] text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Folder size={16} className="text-muted-foreground" />
+                {doc.kategori}
+              </button>
+            </div>
             {doc.catatan && <div className="px-3 py-2 rounded-lg bg-sakura-warning/10 border border-sakura-warning/30 text-sm text-sakura-warning font-medium">⚠ {doc.catatan}</div>}
             <div className="flex flex-wrap gap-3">
               <button onClick={() => setShowPdf(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"><Eye size={16} /> Preview</button>

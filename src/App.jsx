@@ -45,7 +45,9 @@ function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/archive" element={<ArchivePage />} />
-        <Route path="/approval" element={<ApprovalPage />} />
+        <Route path="/approval" element={<Navigate to="/approval/pending" replace />} />
+        <Route path="/approval/pending" element={<ApprovalPendingPage />} />
+        <Route path="/approval/approved" element={<ApprovalApprovedPage />} />
         <Route path="/users" element={<UserManagementPage />} />
         <Route path="/roles" element={<RoleManagementPage />} />
         <Route path="/logs" element={<LogPage />} />
