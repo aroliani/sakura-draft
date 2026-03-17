@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Dashboard" subtitle="Ringkasan aktivitas dokumen" />
+      <Header title="Dashboard" subtitle="Ringkasan aktivitas dokumen" />
 
       <div className="p-6 lg:p-8 space-y-6" style={{ background: "hsl(340 20% 97%)" }}>
         {/* Hero greeting */}
