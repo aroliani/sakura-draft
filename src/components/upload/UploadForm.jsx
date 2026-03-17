@@ -174,7 +174,7 @@ export default function UploadForm({ onSuccess, onCancel, selectedModule, guruUp
       folderTujuan: autoFolderDisplay || undefined,
       urgent: isUrgent,
       sensitif: isSensitif,
-      ownerNIP: isSensitif ? ownerNip : undefined,
+      ownerNIPs: isSensitif ? ownerNIPs : [],
     });
 
     setShowConfirm(false);
