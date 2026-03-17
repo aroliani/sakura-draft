@@ -57,8 +57,8 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Falling petals overlay */}
-      <SakuraPetalsFalling />
+      {/* Falling petals — z-index 1, behind all content */}
+      <FallingPetals />
 
       {/* Burst petals overlay */}
       <PetalBurstOverlay petals={petals} />
