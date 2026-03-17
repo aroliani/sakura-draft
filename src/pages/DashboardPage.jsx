@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { FileText, Clock, CheckCircle, Archive, XCircle, Eye, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
-import AppHeader from "@/components/layout/AppHeader";
+import Header from "@/components/layout/Header";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import ActivityChart from "@/components/dashboard/ActivityChart";
-import DocumentListModal from "@/components/modals/DocumentListModal";
-import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
+import { DocumentList } from "@/components/document/DocumentDetail";
+import DocumentDetailModal from "@/components/document/DocumentDetail";
 import { useApp } from "@/contexts/AppContext";
 import { format, differenceInHours } from "date-fns";
 
