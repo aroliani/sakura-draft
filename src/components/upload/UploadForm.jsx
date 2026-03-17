@@ -297,7 +297,7 @@ export default function UploadForm({ onSuccess, onCancel, selectedModule, guruUp
             )}
           </div>
 
-          {/* Sensitive toggle */}
+          {/* Sensitive toggle + Multi-select NIP */}
           <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">Dokumen Sensitif (hanya bisa dilihat pemilik)</span>
@@ -313,7 +313,54 @@ export default function UploadForm({ onSuccess, onCancel, selectedModule, guruUp
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1">NIP Pemilik Dokumen *</label>
-                  <input value={ownerNip} onChange={(e) => setOwnerNip(e.target.value)} placeholder="18 digit NIP" maxLength={18} className="w-full px-3 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  {/* Selected NIPs as pills */}
+                  {ownerNIPs.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {ownerNIPs.map((nip) => {
+                        const user = nipUsers.find((u) => u.nip === nip);
+                        return (
+                          <span key={nip} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                            {user ? `${user.nama} — ${nip}` : nip}
+                            {!guruUploadOwn && (
+                              <button type="button" onClick={() => removeNip(nip)} className="hover:text-destructive">
+                                <X size={12} />
+                              </button>
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {/* Searchable dropdown */}
+                  {!guruUploadOwn && (
+                    <div className="relative">
+                      <div className="relative">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                          value={nipSearch}
+                          onChange={(e) => { setNipSearch(e.target.value); setNipDropdownOpen(true); }}
+                          onFocus={() => setNipDropdownOpen(true)}
+                          placeholder="Cari nama atau NIP..."
+                          className="w-full pl-8 pr-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+                      {nipDropdownOpen && filteredNipUsers.length > 0 && (
+                        <div className="absolute z-30 top-full mt-1 w-full bg-card border border-border rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                          {filteredNipUsers.map((u) => (
+                            <button
+                              key={u.nip}
+                              type="button"
+                              onClick={() => addNip(u.nip)}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                            >
+                              <span className="font-medium text-foreground">{u.nama}</span>
+                              <span className="text-muted-foreground"> — {u.nip}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
