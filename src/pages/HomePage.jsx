@@ -3,14 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import logoSakura from "@/assets/logo_sakura.png";
-import SakuraBranch from "@/components/SakuraBranch";
-import FallingPetals from "@/components/FallingPetals";
-import FloatingParticles from "@/components/FloatingParticles";
-import PetalBurstOverlay, { usePetalBurst } from "@/components/home/PetalBurst";
+import SakuraBranch, { FloatingParticles, PetalBurstOverlay, usePetalBurst } from "@/components/sakura/SakuraBranch";
+import FallingPetals from "@/components/sakura/FallingPetals";
 import AboutSection from "@/components/home/AboutSection";
-import ArchiveSection from "@/components/home/ArchiveSection";
-import WorkflowSection from "@/components/home/WorkflowSection";
-import SecuritySection from "@/components/home/SecuritySection";
+import FeaturesSection from "@/components/home/FeaturesSection";
 import SchoolSection from "@/components/home/SchoolSection";
 
 export default function HomePage() {
@@ -180,9 +176,7 @@ export default function HomePage() {
       >
         <div className="relative z-[2] max-w-5xl mx-auto px-6 py-24 space-y-24">
           <AboutSection />
-          <ArchiveSection />
-          <WorkflowSection />
-          <SecuritySection />
+          <FeaturesSection />
           <SchoolSection />
         </div>
       </div>

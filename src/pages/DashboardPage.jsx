@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { FileText, Clock, CheckCircle, Archive, XCircle, Eye, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
-import AppHeader from "@/components/layout/AppHeader";
+import Header from "@/components/layout/Header";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import ActivityChart from "@/components/dashboard/ActivityChart";
-import DocumentListModal from "@/components/modals/DocumentListModal";
-import DocumentDetailModal from "@/components/modals/DocumentDetailModal";
+import { DocumentList } from "@/components/document/DocumentDetail";
+import DocumentDetailModal from "@/components/document/DocumentDetail";
 import { useApp } from "@/contexts/AppContext";
 import { format, differenceInHours } from "date-fns";
 
@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Dashboard" subtitle="Ringkasan aktivitas dokumen" />
+      <Header title="Dashboard" subtitle="Ringkasan aktivitas dokumen" />
 
       <div className="p-6 lg:p-8 space-y-6" style={{ background: "hsl(340 20% 97%)" }}>
         {/* Hero greeting */}
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       </div>
 
       {listModal && !detailDoc && (
-        <DocumentListModal title={listModal.title} documents={listModal.docs} onClose={() => setListModal(null)} onSelectDocument={(doc) => setDetailDoc(doc)} />
+        <DocumentList title={listModal.title} documents={listModal.docs} onClose={() => setListModal(null)} onSelectDocument={(doc) => setDetailDoc(doc)} />
       )}
       {detailDoc && <DocumentDetailModal document={detailDoc} onClose={() => setDetailDoc(null)} />}
     </>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, User, Building, Hash, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import logoSakura from "@/assets/logo_sakura.png";
-import SakuraPetals from "@/components/SakuraPetals";
+import SakuraPetals from "@/components/sakura/SakuraPetals";
 import { useApp } from "@/contexts/AppContext";
 
 const DEPARTEMEN_OPTIONS = [
