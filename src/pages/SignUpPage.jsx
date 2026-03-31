@@ -1,10 +1,11 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, User, Building, Hash, Clock } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Building, Hash, Clock, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import logoSakura from "@/assets/logo_sakura.png";
 import SakuraPetals from "@/components/sakura/SakuraPetals";
 import { useApp } from "@/contexts/AppContext";
+import sakuraBg from "@/assets/sakura_branch.png"; 
 
 const DEPARTEMEN_OPTIONS = [
   "Matematika", "Bahasa Indonesia", "Bahasa Inggris", "IPA", "IPS",
@@ -74,35 +75,69 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-center w-5/12 relative overflow-hidden px-12 py-16" style={{ background: "linear-gradient(135deg, hsl(340 65% 30%), hsl(340 73% 42%), hsl(340 50% 38%))" }}>
+      {/* ── Left panel ── */}
+      <div className="hidden lg:flex flex-col justify-center w-5/12 relative overflow-hidden px-12 py-16">
+
+        {/* 🌸 Base pink background */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "hsl(340 73% 65%)" }}
+        />
+
+        {/* 🌸 Sakura branch image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${sakuraBg})`, opacity: 0.55 }}
+        />
+
+        {/* 🌸 Dark gradient overlay agar teks putih terbaca */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to bottom, hsl(340 60% 30% / 0.45) 0%, hsl(340 55% 25% / 0.70) 60%, hsl(340 50% 20% / 0.85) 100%)",
+          }}
+        />
+
         <SakuraPetals count={10} />
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3" />
-        <div className="relative">
+
+        <div className="relative z-10">
           <div className="flex items-center gap-3 mb-10">
             <button onClick={() => navigate("/")} className="flex items-center gap-3 group">
               <img src={logoSakura} alt="SAKURA" className="w-11 h-11 rounded-xl" />
               <div className="text-left">
                 <div className="text-white font-bold text-xl tracking-wider">SAKURA</div>
-                <div className="text-white/50 text-xs font-medium">Document Management System</div>
+                <div className="text-white/70 text-xs font-medium">Document Management System</div>
               </div>
             </button>
           </div>
           <h1 className="text-3xl font-extrabold text-white leading-[1.15] mb-4">Daftar Akun Baru</h1>
-          <p className="text-white/60 text-base leading-relaxed max-w-lg">
+          <p className="text-white/80 text-base leading-relaxed max-w-lg">
             Bergabung dengan SAKURA untuk mengelola dokumen administrasi sekolah secara digital.
           </p>
-          <p className="mt-auto text-white/30 text-[11px] pt-12 font-medium">© 2026 SAKURA · Developed by Group 5</p>
+          <p className="mt-auto text-white/50 text-[11px] pt-12 font-medium">© 2026 SAKURA · Developed by Group 5</p>
         </div>
       </div>
 
-      {/* Right panel */}
+      {/* ── Right panel ── */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 bg-background py-8">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-md">
           <button onClick={() => navigate("/")} className="lg:hidden flex items-center gap-3 mb-6">
             <img src={logoSakura} alt="SAKURA" className="w-10 h-10 rounded-xl" />
-            <span className="text-xl font-bold text-primary tracking-wider">SAKURA</span>
+            <span className="text-xl font-bold tracking-wider" style={{ color: "hsl(347 45% 38%)" }}>SAKURA</span>
           </button>
+
+          {/* Kembali ke Home */}
+          <div className="mb-6">
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center gap-1.5 text-sm font-medium hover:underline transition-colors"
+              style={{ color: "hsl(347 45% 38%)" }}
+            >
+              <ArrowLeft size={15} />
+              Kembali ke Home
+            </button>
+          </div>
+
           <h2 className="text-2xl font-bold text-foreground mb-1 lg:text-left text-center">Daftar Akun Guru</h2>
           <p className="text-muted-foreground mb-6 text-sm lg:text-left text-center">Akun akan diaktifkan oleh Operator TU setelah pendaftaran</p>
 
@@ -162,11 +197,11 @@ export default function SignUpPage() {
 
             {error && <p className="text-sm text-destructive font-medium">{error}</p>}
 
-            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} type="submit" className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} type="submit" className="w-full py-2.5 rounded-xl font-semibold hover:opacity-90 transition-opacity text-white" style={{ background: "hsl(347 55% 42%)" }}>
               Daftar Akun
             </motion.button>
           </form>
-          <p className="text-center text-sm text-muted-foreground mt-6">Sudah punya akun?{" "}<button onClick={() => navigate("/login")} className="text-primary font-semibold hover:underline">Masuk di sini</button></p>
+          <p className="text-center text-sm text-muted-foreground mt-6">Sudah punya akun?{" "}<button onClick={() => navigate("/login")} className="font-semibold hover:underline" style={{ color: "hsl(347 45% 38%)" }}>Masuk di sini</button></p>
           <div className="border-t border-border/50 mt-6" />
           <p className="text-center text-xs text-muted-foreground py-4">© 2026 SAKURA · Developed by Group 5</p>
         </motion.div>

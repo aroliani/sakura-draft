@@ -15,11 +15,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 26% 14%;
 
-    --primary: 347 55% 49%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 340 75% 75%;
+    --primary-foreground: 340 20% 18%;
 
-    --secondary: 347 40% 95%;
-    --secondary-foreground: 347 55% 35%;
+    --secondary: 340 80% 90%;
+    --secondary-foreground: 340 60% 24%;
 
     --muted: 340 15% 96%;
     --muted-foreground: 260 10% 42%;
@@ -61,20 +61,20 @@
   }
 
   .dark {
-    --background: 340 10% 8%;
-    --foreground: 340 10% 92%;
+    --background: 340 15% 14%;
+    --foreground: 340 18% 94%;
 
-    --card: 340 10% 11%;
-    --card-foreground: 340 10% 92%;
+    --card: 340 15% 20%;
+    --card-foreground: 340 18% 90%;
 
-    --popover: 340 10% 11%;
-    --popover-foreground: 340 10% 92%;
+    --popover: 340 15% 20%;
+    --popover-foreground: 340 18% 90%;
 
-    --primary: 347 55% 52%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 340 60% 82%;
+    --primary-foreground: 340 20% 16%;
 
-    --secondary: 347 18% 16%;
-    --secondary-foreground: 347 18% 80%;
+    --secondary: 340 65% 92%;
+    --secondary-foreground: 340 30% 24%;
 
     --muted: 340 10% 16%;
     --muted-foreground: 340 8% 55%;
@@ -159,6 +159,14 @@
   .glass {
     backdrop-filter: blur(12px) saturate(180%);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -436,6 +444,21 @@
   50% { transform: rotate(1deg); }
 }
 
+/* Branch draw / grow effect */
+@keyframes branchDraw {
+  0% {
+    stroke-dashoffset: 1200;
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
 /* Orbit for petals around logo */
 @keyframes orbit {
   from { transform: rotate(0deg) translateX(var(--orbit-radius, 140px)) rotate(0deg); }
@@ -506,6 +529,7 @@
     opacity: 0.3;
   }
 }
+
 /* Continuously spawned falling petals */
 @keyframes sakuraPetalFall {
   0% {

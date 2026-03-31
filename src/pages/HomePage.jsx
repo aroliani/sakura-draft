@@ -34,7 +34,9 @@ export default function HomePage() {
         }}
       >
         <div className="flex items-center gap-2.5">
-          <img src={logoSakura} alt="SAKURA" className="w-8 h-8 rounded-lg" />
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-white/90 shadow-sm border border-white/30 flex items-center justify-center">
+            <img src={logoSakura} alt="SAKURA" className="w-full h-full object-cover" />
+          </div>
           <span className="font-semibold text-foreground tracking-wider text-sm">SAKURA</span>
         </div>
         <div className="flex items-center gap-2">

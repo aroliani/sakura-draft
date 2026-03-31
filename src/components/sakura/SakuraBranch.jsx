@@ -172,6 +172,14 @@ function renderBud(bud) {
   );
 }
 
+const branchDrawStyle = (delay = 0) => ({
+  strokeDasharray: 1200,
+  strokeDashoffset: 1200,
+  opacity: 0,
+  animation: `branchDraw 2.5s ease-out forwards`,
+  animationDelay: `${delay}s`,
+});
+
 export default function SakuraBranch({ onFlowerClick }) {
   const [hoveredId, setHoveredId] = useState(null);
 
@@ -179,7 +187,7 @@ export default function SakuraBranch({ onFlowerClick }) {
     <svg
       className="absolute inset-0 w-full h-full"
       viewBox="0 0 1200 800"
-      preserveAspectRatio="xMinYMid slice"
+      preserveAspectRatio="xMinYMin slice"
       style={{ zIndex: 2, overflow: "visible" }}
       aria-hidden="true"
     >
@@ -208,27 +216,29 @@ export default function SakuraBranch({ onFlowerClick }) {
       <path
         d="M -60 420 C 40 400, 120 370, 200 340 C 280 310, 360 290, 440 270 C 520 250, 580 240, 650 235"
         fill="none" stroke="url(#branchMain)" strokeWidth="22" strokeLinecap="round"
+        style={branchDrawStyle(0)}
       />
       <path
         d="M -60 420 C 20 405, 80 385, 160 360"
         fill="none" stroke="url(#branchMain)" strokeWidth="28" strokeLinecap="round" opacity="0.7"
+        style={branchDrawStyle(0.15)}
       />
 
       {/* ── SUB-BRANCHES ── */}
-      <path d="M 280 325 C 310 290, 340 250, 380 210 C 410 180, 440 160, 480 145" fill="none" stroke="url(#branchSub)" strokeWidth="12" strokeLinecap="round" />
-      <path d="M 440 270 C 480 250, 520 230, 560 200 C 590 180, 620 165, 660 155" fill="none" stroke="url(#branchSub)" strokeWidth="10" strokeLinecap="round" />
-      <path d="M 360 300 C 390 330, 420 360, 450 400 C 470 425, 490 445, 520 460" fill="none" stroke="url(#branchSub)" strokeWidth="11" strokeLinecap="round" />
-      <path d="M 550 245 C 580 220, 610 195, 650 175" fill="none" stroke="url(#branchSub)" strokeWidth="8" strokeLinecap="round" />
+      <path d="M 280 325 C 310 290, 340 250, 380 210 C 410 180, 440 160, 480 145" fill="none" stroke="url(#branchSub)" strokeWidth="12" strokeLinecap="round" style={branchDrawStyle(0.3)} />
+      <path d="M 440 270 C 480 250, 520 230, 560 200 C 590 180, 620 165, 660 155" fill="none" stroke="url(#branchSub)" strokeWidth="10" strokeLinecap="round" style={branchDrawStyle(0.4)} />
+      <path d="M 360 300 C 390 330, 420 360, 450 400 C 470 425, 490 445, 520 460" fill="none" stroke="url(#branchSub)" strokeWidth="11" strokeLinecap="round" style={branchDrawStyle(0.45)} />
+      <path d="M 550 245 C 580 220, 610 195, 650 175" fill="none" stroke="url(#branchSub)" strokeWidth="8" strokeLinecap="round" style={branchDrawStyle(0.5)} />
 
       {/* ── TWIGS ── */}
-      <path d="M 200 345 C 210 320, 225 300, 245 280" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M 320 305 C 330 280, 345 260, 365 245" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 480 145 C 500 130, 520 120, 545 115" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 520 460 C 540 470, 555 475, 575 478" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 650 155 C 670 145, 690 138, 710 135" fill="none" stroke="url(#branchTwig)" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M 650 235 C 670 230, 695 228, 720 230" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" />
-      <path d="M 150 370 C 155 350, 165 335, 180 320" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 600 210 C 615 195, 630 185, 650 178" fill="none" stroke="url(#branchTwig)" strokeWidth="3" strokeLinecap="round" />
+      <path d="M 200 345 C 210 320, 225 300, 245 280" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" style={branchDrawStyle(0.55)} />
+      <path d="M 320 305 C 330 280, 345 260, 365 245" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" style={branchDrawStyle(0.6)} />
+      <path d="M 480 145 C 500 130, 520 120, 545 115" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" style={branchDrawStyle(0.65)} />
+      <path d="M 520 460 C 540 470, 555 475, 575 478" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" style={branchDrawStyle(0.7)} />
+      <path d="M 650 155 C 670 145, 690 138, 710 135" fill="none" stroke="url(#branchTwig)" strokeWidth="3.5" strokeLinecap="round" style={branchDrawStyle(0.75)} />
+      <path d="M 650 235 C 670 230, 695 228, 720 230" fill="none" stroke="url(#branchTwig)" strokeWidth="5" strokeLinecap="round" style={branchDrawStyle(0.8)} />
+      <path d="M 150 370 C 155 350, 165 335, 180 320" fill="none" stroke="url(#branchTwig)" strokeWidth="4" strokeLinecap="round" style={branchDrawStyle(0.85)} />
+      <path d="M 600 210 C 615 195, 630 185, 650 178" fill="none" stroke="url(#branchTwig)" strokeWidth="3" strokeLinecap="round" style={branchDrawStyle(0.9)} />
 
       {/* ── BUDS ── */}
       {BUD_POSITIONS.map((bud) => renderBud(bud))}
