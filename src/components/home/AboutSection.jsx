@@ -55,20 +55,19 @@ function Slide1() {
       {/* LEFT — Logo */}
       <div className="flex flex-col items-center gap-4 md:w-[45%] flex-shrink-0">
         <div
-          className="flex items-center justify-center rounded-full bg-white"
+          className="flex items-center justify-center rounded-full bg-white overflow-hidden"
           style={{
             width: 220,
             height: 220,
             boxShadow:
               "0 8px 40px rgba(194,58,87,0.15), 0 0 0 8px rgba(255,182,193,0.2), 0 0 0 16px rgba(255,182,193,0.1)",
-            padding: 20,
           }}
         >
           <img
             src={logoSakura}
             alt="SAKURA Logo"
-            className="rounded-xl"
-            style={{ width: 160, height: 160, objectFit: "contain" }}
+            className="w-full h-full object-cover"
+            style={{ borderRadius: "50%" }}
           />
         </div>
         <p className="text-sm text-muted-foreground text-center">

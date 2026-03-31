@@ -158,7 +158,6 @@ const WorkflowFeature = () => (
 
 const securityFeatures = [
   "Role-Based Access Control (RBAC)",
-  "Tanda tangan kriptografis HMAC-SHA256",
   "QR Code verifikasi otomatis",
   "Audit trail lengkap",
 ];

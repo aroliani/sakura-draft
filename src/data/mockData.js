@@ -264,7 +264,7 @@ export const PERMISSIONS = [
 ];
 
 export const ROLE_PERMISSIONS = {
-  "Operator/TU": ["dashboard.view", "documents.upload", "documents.archive", "documents.edit", "users.manage", "roles.manage", "audit.view", "audit.addNote", "profile.edit", "documents.approve"],
+  "Operator/TU": ["dashboard.view", "documents.upload", "documents.archive", "documents.edit", "users.manage", "roles.manage", "audit.view", "audit.addNote", "profile.edit"],
   "Kepala Sekolah": ["dashboard.view", "documents.approve", "documents.reject", "documents.archive", "audit.view", "profile.edit"],
   "Guru": ["dashboard.view", "documents.archive", "profile.edit"],
 };
